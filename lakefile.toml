@@ -1,7 +1,7 @@
 name = "ZetaZeros"
 version = "0.1.0"
 keywords = ["math"]
-defaultTargets = ["ZetaZeros"]
+defaultTargets = ["ZetaZeros", "ZetaZeros.Unconditional"]
 
 [leanOptions]
 pp.unicode.fun = true # pretty-prints `fun a ↦ b`
@@ -25,3 +25,20 @@ name = "Challenge"
 
 [[lean_lib]]
 name = "Solution"
+
+# Classical analytic inputs vendored from anthropics/formal-math (zeta23/), Apache-2.0; see
+# NOTICE and Vendored/Zeta23.lean. Module names retain their upstream `Zeta23.` prefix.
+[[lean_lib]]
+name = "Zeta23"
+srcDir = "Vendored"
+
+[lean_lib.leanOptions]
+weak.linter.mathlibStandardSet = false
+
+# Zero-free-region input vendored from plby/lean-proofs; see NOTICE and the preserved license.
+[[lean_lib]]
+name = "ErdosProblems"
+srcDir = "Vendored"
+
+[lean_lib.leanOptions]
+weak.linter.mathlibStandardSet = false

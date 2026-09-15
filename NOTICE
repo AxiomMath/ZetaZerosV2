@@ -1,0 +1,30 @@
+ZetaZeros
+Copyright (c) 2026 Axiom Math.
+
+This product includes software derived from the `zeta23/` project of
+anthropics/formal-math (https://github.com/anthropics/formal-math), Copyright (c) 2026
+Anthropic, PBC, licensed under the Apache License, Version 2.0. The derived files are the
+ones under `Vendored/Zeta23/`; they carry only the small compatibility edits needed for this
+repository's Mathlib version, principally updated theorem names for pointwise functions. The
+vendored subset consists only of the classical analytic inputs of
+that project (the Riemann--von Mangoldt formula and local zero count, Weil's explicit formula,
+the Montgomery--Vaughan Hilbert inequality, Stirling-type facts for Gamma'/Gamma, the
+Chebyshev--Mertens prime sums, and the reflection symmetry of zero multiplicities); nothing
+from its rank--trace / Gram-matrix proof mechanism is included. See `Vendored/Zeta23.lean`.
+
+Some of those files (under `Vendored/Zeta23/FromPNTPlus/`) in turn derive from
+PrimeNumberTheoremAnd (https://github.com/AlexKontorovich/PrimeNumberTheoremAnd), Copyright
+the PrimeNumberTheoremAnd contributors, licensed under the Apache License, Version 2.0; each
+carries its upstream notice. Some of those in turn derive from mathlib
+(https://github.com/leanprover-community/mathlib4), Copyright the mathlib contributors,
+licensed under the Apache License, Version 2.0.
+
+The additional source files under `Vendored/ErdosProblems/Erdos421/` come from
+plby/lean-proofs (https://github.com/plby/lean-proofs), commit
+87b073cb8b00ffdd32cc6b84e89a7d9fcc6290fe, in `src/latest/ErdosProblems/Erdos421/`.
+The included subset is the 147-module source dependency closure of
+`Erdos421.riemannZeta_eventually_ne_zero_log_power_strip`. This theorem concerns
+Mathlib's Riemann zeta function and supplies the unconditional zero-free width
+c / (log |t|)^(15/16) used at the closed pair-correlation endpoint. The upstream
+`src/latest/LICENSE` notice is preserved verbatim in `Vendored/ErdosProblems/LICENSE`; the Lean
+sources carry only small Mathlib-compatibility edits.
