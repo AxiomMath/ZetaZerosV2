@@ -35,16 +35,4 @@ theorem left_coordinate_collision_card_le (n k N : ℕ) (i j : Fin (n + 2)) (hij
       · exact congrArg Prod.fst h
     · exact congrArg (fun z : ((Fin n → Fin N) × Fin N) × (Fin (n + 2) → Fin N) ↦ z.2) h
 
-theorem right_coordinate_collision_card_le (n k N : ℕ) (i j : Fin (n + 2)) (hij : i ≠ j) :
-    ((vinogradovSolutions (n + 2) k N 0).filter (fun p ↦ p.2 i = p.2 j)).card ≤
-      repeatedIntegerCount n k N := by
-  apply le_trans _ (left_coordinate_collision_card_le n k N i j hij)
-  apply Finset.card_le_card_of_injOn Prod.swap
-  · intro p hp
-    obtain ⟨hpS, hpij⟩ := Finset.mem_filter.mp hp
-    refine Finset.mem_filter.mpr ⟨Finset.mem_filter.mpr ⟨Finset.mem_univ _, ?_⟩, hpij⟩
-    apply sub_eq_zero.mpr
-    exact (sub_eq_zero.mp (Finset.mem_filter.mp hpS).2).symm
-  · exact fun _ _ _ _ h ↦ Prod.swap_injective h
-
 end Erdos421

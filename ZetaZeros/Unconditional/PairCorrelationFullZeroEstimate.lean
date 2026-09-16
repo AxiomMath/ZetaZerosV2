@@ -32,16 +32,6 @@ theorem primePositiveCoeff_sq_summable (x : ℝ) (hx : 1 ≤ x) :
     exact_mod_cast (show 1 ≤ k + 1 by omega)
   nlinarith [sq_nonneg ‖primePositiveCoeff x k‖]
 
-/-- Removing the harmless index weight preserves square summability. -/
-theorem primeNegativeCoeff_sq_summable (x : ℝ) (hx : 1 ≤ x) :
-    Summable (fun k : ℕ => ‖primeNegativeCoeff x k‖ ^ 2) := by
-  apply Summable.of_nonneg_of_le (fun k => sq_nonneg _) _
-    (primeNegativeCoeff_weighted_summable x hx)
-  intro k
-  have hk : (1 : ℝ) ≤ (k : ℝ) + 1 := by
-    exact_mod_cast (show 1 ≤ k + 1 by omega)
-  nlinarith [sq_nonneg ‖primeNegativeCoeff x k‖]
-
 /-- The unweighted positive-frequency diagonal is the smoothed prime mean square. -/
 theorem primePositiveCoeff_sq_tsum_eq (x : ℝ) (hx : 1 ≤ x) :
     (∑' k : ℕ, ‖primePositiveCoeff x k‖ ^ 2) = pairPrimeMeanSquare x := by

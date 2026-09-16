@@ -37,10 +37,6 @@ theorem compactExplicitFormula (k : ℝ → ℂ) (hk : ContDiff ℝ 2 k)
         Zeta23.EF.literatureRHS k :=
   Zeta23.WeilEF.EF_lit_zeta Zeta23.zetaSeam k hk hkc
 
-/-- The complete, unconditional collection of facts about the Archimedean density `Zeta23.mu`. -/
-theorem archimedeanDensity_facts : Zeta23.GammaFacts :=
-  Zeta23.gammaFacts
-
 /-- The Archimedean density is even. -/
 theorem archimedeanDensity_even (u : ℝ) : Zeta23.mu (-u) = Zeta23.mu u :=
   Zeta23.mu_even u
@@ -558,7 +554,7 @@ theorem montgomeryKernel_zeroSeries_summable (x : ℝ) (hx : 1 ≤ x) (t : ℝ) 
   convert zeroLorentzianSummand_summable x hx t using 1
   funext rho
   rw [montgomeryKernel_paperFT_zero x hx t rho]
-  simp only [Zeta23.zetaZeros_mult]
+  dsimp only [Zeta23.zetaZeros]
   ring
 
 /-- The zero side of the explicit formula is the full Lorentzian zero sum. -/
@@ -573,7 +569,7 @@ theorem montgomeryKernel_zero_tsum (x : ℝ) (hx : 1 ≤ x) (t : ℝ) :
   apply tsum_congr
   intro rho
   rw [montgomeryKernel_paperFT_zero x hx t rho]
-  simp only [Zeta23.zetaZeros_mult]
+  dsimp only [Zeta23.zetaZeros]
   ring
 
 /-- Uniform bound for either pole value of the transformed Montgomery kernel. -/
@@ -735,10 +731,6 @@ theorem norm_montgomeryKernel (x t u : ℝ) :
   rw [hmod, Real.exp_zero, mul_one]
   simp
 
-theorem montgomeryKernel_locallyIntegrable (x t : ℝ) :
-    LocallyIntegrable (montgomeryKernel x t) :=
-  (montgomeryKernel_integrable x t).locallyIntegrable
-
 theorem montgomeryTailCutoff_integrable (x t : ℝ) (n : ℕ) :
     Integrable (montgomeryTailCutoff x t n) := by
   have hbase := montgomeryKernel_integrable x t
@@ -755,12 +747,6 @@ theorem montgomeryTailCutoff_integrable (x t : ℝ) (n : ℕ) :
         montgomeryKernel x t (u + montgomeryCutoffRadius n)) := by
     exact (hbase.comp_add_right (montgomeryCutoffRadius n)).const_mul _
   exact (hbase.add hright).add hleft
-
-theorem montgomerySmoothed_contDiff (x t : ℝ) (n : ℕ) :
-    ContDiff ℝ ∞ (montgomerySmoothed x t n) := by
-  exact (montgomeryBump n).hasCompactSupport_normed.contDiff_convolution_left
-    (ContinuousLinearMap.lsmul ℝ ℝ) (montgomeryBump n).contDiff_normed
-    (montgomeryKernel_locallyIntegrable x t)
 
 theorem montgomeryCompactApprox_contDiff (x t : ℝ) (n : ℕ) :
     ContDiff ℝ 2 (montgomeryCompactApprox x t n) := by

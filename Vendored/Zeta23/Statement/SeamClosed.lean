@@ -26,25 +26,12 @@ carrier = {ρ | IsNontrivialZero ρ}, mult = zeroMult (both rfl). -/
 def zetaZeroConfig : ZeroConfig := zetaZeros zetaSeam
 
 @[simp] lemma zetaZeroConfig_carrier : zetaZeroConfig.carrier = {ρ | IsNontrivialZero ρ} := rfl
-@[simp] lemma zetaZeroConfig_mult : zetaZeroConfig.mult = zeroMult := rfl
 
 @[simp] lemma zetaZeroConfig_N (T₁ T₂ : ℝ) : zetaZeroConfig.N T₁ T₂ = Ncount T₁ T₂ :=
   zetaZeros_N _ _ _
-@[simp] lemma zetaZeroConfig_N0star (T₁ T₂ : ℝ) : zetaZeroConfig.N0star T₁ T₂ = N0star T₁ T₂ :=
-  zetaZeros_N0star _ _ _
-@[simp] lemma zetaZeroConfig_N0s (T₁ T₂ : ℝ) : zetaZeroConfig.N0s T₁ T₂ = N0simple T₁ T₂ :=
-  zetaZeros_N0s _ _ _
-@[simp] lemma zetaZeroConfig_Nd (T₁ T₂ : ℝ) : zetaZeroConfig.Nd T₁ T₂ = Ndist T₁ T₂ :=
-  zetaZeros_Nd _ _ _
-
-/-- [eq:trivialchain] for ζ, hypothesis-free: N₀ˢ ≤ N₀* ≤ N₀ ≤ N and N₀ˢ ≤ Nˢ ≤ N_d ≤ N. -/
-theorem trivial_chain₀ (T₁ T₂ : ℝ) :
-    N0simple T₁ T₂ ≤ N0star T₁ T₂ ∧ N0star T₁ T₂ ≤ N0 T₁ T₂ ∧ N0 T₁ T₂ ≤ Ncount T₁ T₂ ∧
-    N0simple T₁ T₂ ≤ Nsimple T₁ T₂ ∧ Nsimple T₁ T₂ ≤ Ndist T₁ T₂ ∧ Ndist T₁ T₂ ≤ Ncount T₁ T₂ :=
-  trivial_chain zetaSeam T₁ T₂
 
 /-- Finiteness of every ordinate window of nontrivial zeros, hypothesis-free. -/
-theorem zerosIn_finite (T₁ T₂ : ℝ) : (zerosIn T₁ T₂).Finite := by
-  simpa [zetaZeros_window] using (zetaZeros zetaSeam).window_finite T₁ T₂
+theorem zerosIn_finite (T₁ T₂ : ℝ) : (zerosIn T₁ T₂).Finite :=
+  (zetaZeros zetaSeam).window_finite T₁ T₂
 
 end Zeta23

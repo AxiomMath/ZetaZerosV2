@@ -22,16 +22,6 @@ namespace ZetaZeros.Unconditional.PairCorrelationProof
 open Complex MeasureTheory Set Filter
 open scoped BigOperators Interval Topology ComplexConjugate
 
-/-- A division-form adapter for the scaled Young inequality used below. -/
-lemma two_mul_le_scaled_sq (u v r : ℝ) (hr : 0 < r) :
-    2 * u * v ≤ r * u ^ 2 + v ^ 2 / r := by
-  calc
-    2 * u * v ≤ r * u ^ 2 + r⁻¹ * v ^ 2 :=
-      two_mul_le_add_mul_sq (a := u) (b := v) (ε := r) hr
-    _ = r * u ^ 2 + v ^ 2 / r := by
-      rw [div_eq_mul_inv]
-      ring
-
 /-- The two diagonal squares cancel exactly from the square of their signed sum. -/
 lemma abs_norm_neg_add_sq_sub_squares_le (u v : ℂ) :
     |‖-u + v‖ ^ 2 - (‖u‖ ^ 2 + ‖v‖ ^ 2)| ≤
@@ -182,34 +172,5 @@ theorem intervalIntegral_fullZeroPoleTerm_sq_le
       dsimp only [g]
       rw [MeasureTheory.integral_const_mul, integral_univ_inv_one_add_sq]
       ring
-
-/-- After removing its Lorentzian main term, the Archimedean contribution has
-uniformly bounded square energy per unit height. -/
-theorem exists_intervalIntegral_fullZeroArchimedeanRemainder_sq_le :
-    ∃ C : ℝ, 0 ≤ C ∧ ∀ x T : ℝ, 1 ≤ x → 0 ≤ T →
-      (∫ t : ℝ in 0..T,
-        ‖fullZeroArchimedeanTerm x t -
-          (2 * Real.pi * Zeta23.mu t / x : ℂ)‖ ^ 2) ≤ C ^ 2 * T := by
-  obtain ⟨C, hC, harch⟩ := montgomeryKernel_archimedeanTerm
-  refine ⟨C, hC, ?_⟩
-  intro x T hx hT
-  have hpoint : ∀ t ∈ Set.uIoc (0 : ℝ) T,
-      ‖(‖fullZeroArchimedeanTerm x t -
-          (2 * Real.pi * Zeta23.mu t / x : ℂ)‖ ^ 2 : ℝ)‖ ≤ C ^ 2 := by
-    intro t _
-    rw [Real.norm_eq_abs, abs_of_nonneg (sq_nonneg _)]
-    apply (sq_le_sq₀ (norm_nonneg _) hC).2
-    simpa only [fullZeroArchimedeanTerm] using harch x hx t
-  have hbound := intervalIntegral.norm_integral_le_of_norm_le_const hpoint
-  calc
-    (∫ t : ℝ in 0..T,
-        ‖fullZeroArchimedeanTerm x t -
-          (2 * Real.pi * Zeta23.mu t / x : ℂ)‖ ^ 2) ≤
-        ‖∫ t : ℝ in 0..T,
-          ‖fullZeroArchimedeanTerm x t -
-            (2 * Real.pi * Zeta23.mu t / x : ℂ)‖ ^ 2‖ :=
-      (by rw [Real.norm_eq_abs]; exact le_abs_self _)
-    _ ≤ C ^ 2 * |T - 0| := hbound
-    _ = C ^ 2 * T := by rw [sub_zero, abs_of_nonneg hT]
 
 end ZetaZeros.Unconditional.PairCorrelationProof

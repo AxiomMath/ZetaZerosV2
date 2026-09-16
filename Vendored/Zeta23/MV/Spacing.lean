@@ -128,25 +128,6 @@ lemma integral_inv_four_Icc {a b c : ℝ} (hab : a ≤ b) (hc : c < a ∨ b < c)
   set B := ((a - c) ^ (3:ℕ))⁻¹
   linarith
 
-omit [Fintype ι] [DecidableEq ι] in
-/-- Closed-interval version of the membership bounds (for use on closures `J t`). -/
-lemma abs_bounds_closed (h : Adm freq δ) {s t : ι} (hts : t ≠ s) {u : ℝ}
-    (hut : |u - freq t| ≤ δ t / 2) :
-    |freq s - u| ≤ 3 / 2 * |freq s - freq t| ∧ δ s / 2 ≤ |u - freq s| := by
-  have hst : δ t ≤ |freq s - freq t| := by rw [abs_sub_comm]; exact h.le t s hts
-  have hss : δ s ≤ |freq s - freq t| := h.le s t (Ne.symm hts)
-  constructor
-  · calc |freq s - u| = |(freq s - freq t) + (freq t - u)| := by ring_nf
-      _ ≤ |freq s - freq t| + |freq t - u| := abs_add_le _ _
-      _ = |freq s - freq t| + |u - freq t| := by rw [abs_sub_comm (freq t) u]
-      _ ≤ |freq s - freq t| + δ t / 2 := by linarith
-      _ ≤ 3 / 2 * |freq s - freq t| := by linarith
-  · have key : |freq s - freq t| ≤ |freq s - u| + |u - freq t| := by
-      calc |freq s - freq t| = |(freq s - u) + (u - freq t)| := by ring_nf
-        _ ≤ |freq s - u| + |u - freq t| := abs_add_le _ _
-    rw [abs_sub_comm u (freq s)]
-    linarith
-
 section MainSpacing
 variable (h : Adm freq δ) (s : ι)
 
@@ -318,7 +299,6 @@ theorem spacing_sq (h : Adm freq δ) (s : ι) :
     _ = 9 / δ s := by field_simp
 
 end MainSpacing
-
 
 /-- **Spacing lemma, σ = 4**: `Σ_{t≠s} δ t/(freq s − freq t)⁴ ≤ 27/(δ s)³`. -/
 theorem spacing_four (h : Adm freq δ) (s : ι) :
@@ -542,7 +522,6 @@ theorem two_point (h : Adm freq δ) {l m : ι} (hlm : l ≠ m) :
     _ = 36 * (δ l + δ m) / (δ l * δ m * (freq l - freq m) ^ 2) := by
         field_simp
         ring
-
 
 end Adm
 end MV

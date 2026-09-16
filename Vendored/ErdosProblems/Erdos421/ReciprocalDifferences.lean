@@ -67,14 +67,6 @@ theorem reciprocalDifference_bounds (k : ℕ) (hs : List ℝ)
             (pow_le_pow_left₀ hx.le hc.1.le _)
         _ = _ := by ring
 
-theorem reciprocalDifference_nonneg (k : ℕ) (hs : List ℝ)
-    (hhs : ∀ h ∈ hs, 0 ≤ h) {x : ℝ} (hx : 0 < x) :
-    0 ≤ reciprocalDifference k hs x := by
-  have hsum : 0 ≤ hs.sum := List.sum_nonneg hhs
-  have hcoef := differenceCoefficient_nonneg k hs hhs
-  exact (by positivity : 0 ≤ differenceCoefficient k hs / (x + hs.sum) ^ (k + 1 + hs.length)).trans
-    (reciprocalDifference_bounds k hs hhs hx).1
-
 theorem differenceCoefficient_pos (k : ℕ) (hs : List ℝ)
     (hhs : ∀ h ∈ hs, 0 < h) : 0 < differenceCoefficient k hs := by
   unfold differenceCoefficient

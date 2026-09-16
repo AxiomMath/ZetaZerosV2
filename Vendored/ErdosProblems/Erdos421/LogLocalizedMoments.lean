@@ -11,9 +11,6 @@ open MeasureTheory
 noncomputable local instance logMomentCircleMeasure : MeasureSpace UnitAddCircle :=
   ⟨AddCircle.haarAddCircle⟩
 
-local instance logMomentCircleHaar : Measure.IsAddHaarMeasure (volume : Measure UnitAddCircle) :=
-  inferInstanceAs (Measure.IsAddHaarMeasure AddCircle.haarAddCircle)
-
 local instance logMomentCircleProbability : IsProbabilityMeasure (volume : Measure UnitAddCircle) :=
   inferInstanceAs (IsProbabilityMeasure AddCircle.haarAddCircle)
 

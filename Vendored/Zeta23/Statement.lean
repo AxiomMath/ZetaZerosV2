@@ -51,22 +51,6 @@ def zerosIn (T₁ T₂ : ℝ) : Set ℂ := {ρ | IsNontrivialZero ρ ∧ T₁ < 
 /-- N(T₁,T₂) := #{ρ : T₁ < γ ≤ T₂} "(counted with multiplicity)"  [Results]. -/
 def Ncount (T₁ T₂ : ℝ) : ℕ := ∑ᶠ ρ ∈ zerosIn T₁ T₂, zeroMult ρ
 
-/-- N_d(T₁,T₂) := #{ρ : T₁ < γ ≤ T₂} "(each distinct point counted once)"  [Results]. -/
-def Ndist (T₁ T₂ : ℝ) : ℕ := (zerosIn T₁ T₂).ncard
-
-/-- N₀(T₁,T₂) := "the number of zeros on the critical line with T₁ < γ ≤ T₂ counted with …
-multiplicity"  [Results]. -/
-def N0 (T₁ T₂ : ℝ) : ℕ := ∑ᶠ ρ ∈ zerosIn T₁ T₂ ∩ {ρ | ρ.re = 1 / 2}, zeroMult ρ
-
-/-- N₀*(T₁,T₂) := same "without multiplicity"  [Results]. This is what Theorem A bounds. -/
-def N0star (T₁ T₂ : ℝ) : ℕ := (zerosIn T₁ T₂ ∩ {ρ | ρ.re = 1 / 2}).ncard
-
-/-- N₀ˢ(T₁,T₂) := #{ρ : T₁ < γ ≤ T₂, β = 1/2, m_ρ = 1}  [Results]. -/
-def N0simple (T₁ T₂ : ℝ) : ℕ := (zerosIn T₁ T₂ ∩ {ρ | ρ.re = 1 / 2} ∩ {ρ | zeroMult ρ = 1}).ncard
-
-/-- Nˢ(T₁,T₂) := "the number of simple zeros" with T₁ < γ ≤ T₂  [Results]. -/
-def Nsimple (T₁ T₂ : ℝ) : ℕ := (zerosIn T₁ T₂ ∩ {ρ | zeroMult ρ = 1}).ncard
-
 /-! ## 2. The seam: ζ's zeros as an abstract ZeroConfig -/
 
 /-- Classical facts about ζ needed to instantiate Zeta23.ZeroConfig; these are established from
@@ -100,25 +84,7 @@ def zetaZeros (hs : ZetaSeam) : ZeroConfig where
 section seam_rfl
 variable (hs : ZetaSeam) (T₁ T₂ : ℝ)
 
-@[simp] lemma zetaZeros_carrier : (zetaZeros hs).carrier = {ρ | IsNontrivialZero ρ} := rfl
-@[simp] lemma zetaZeros_mult : (zetaZeros hs).mult = zeroMult := rfl
-@[simp] lemma zetaZeros_simple : (zetaZeros hs).simple = {ρ | zeroMult ρ = 1} := rfl
-
-lemma zetaZeros_window : (zetaZeros hs).window T₁ T₂ = zerosIn T₁ T₂ := by
-  ext ρ; simp [ZeroConfig.window, zerosIn]
-
-@[simp] lemma zetaZeros_N : (zetaZeros hs).N T₁ T₂ = Ncount T₁ T₂ := by
-  simp [ZeroConfig.N, Ncount, zetaZeros_window]
-@[simp] lemma zetaZeros_Nd : (zetaZeros hs).Nd T₁ T₂ = Ndist T₁ T₂ := by
-  simp [ZeroConfig.Nd, Ndist, zetaZeros_window]
-@[simp] lemma zetaZeros_N0 : (zetaZeros hs).N0 T₁ T₂ = N0 T₁ T₂ := by
-  simp [ZeroConfig.N0, N0, zetaZeros_window, ZeroConfig.onLine]
-@[simp] lemma zetaZeros_N0star : (zetaZeros hs).N0star T₁ T₂ = N0star T₁ T₂ := by
-  simp [ZeroConfig.N0star, N0star, zetaZeros_window, ZeroConfig.onLine]
-@[simp] lemma zetaZeros_N0s : (zetaZeros hs).N0s T₁ T₂ = N0simple T₁ T₂ := by
-  simp [ZeroConfig.N0s, N0simple, zetaZeros_window, ZeroConfig.onLine]
-@[simp] lemma zetaZeros_Ns : (zetaZeros hs).Ns T₁ T₂ = Nsimple T₁ T₂ := by
-  simp [ZeroConfig.Ns, Nsimple, zetaZeros_window]
+@[simp] lemma zetaZeros_N : (zetaZeros hs).N T₁ T₂ = Ncount T₁ T₂ := rfl
 
 end seam_rfl
 
@@ -136,32 +102,6 @@ lemma IsNontrivialZero.not_trivial {ρ : ℂ} (h : IsNontrivialZero ρ) :
   · rintro rfl
     simpa using h.2.2
 
-/-- Mathlib's RiemannHypothesis puts every nontrivial zero (in our sense) on the critical line. -/
-theorem RH_implies_on_line (hRH : RiemannHypothesis) {ρ : ℂ} (h : IsNontrivialZero ρ) :
-    ρ.re = 1 / 2 :=
-  hRH ρ h.1 h.not_trivial.1 h.not_trivial.2
-
-/-- Sanity anchor 1: under Mathlib's RiemannHypothesis all counted zeros are on the
-line, so the on-line counts equal the full counts, with and without multiplicity. No other
-hypotheses. -/
-theorem RH_implies_all_on_line (hRH : RiemannHypothesis) (T₁ T₂ : ℝ) :
-    N0 T₁ T₂ = Ncount T₁ T₂ ∧ N0star T₁ T₂ = Ndist T₁ T₂ := by
-  have hset : zerosIn T₁ T₂ ∩ {ρ | ρ.re = 1 / 2} = zerosIn T₁ T₂ := by
-    ext ρ
-    simp only [mem_inter_iff, mem_ofPred_eq, and_iff_left_iff_imp]
-    exact fun hρ => RH_implies_on_line hRH hρ.1
-  unfold N0 Ncount N0star Ndist
-  rw [hset]
-  exact ⟨rfl, rfl⟩
-
-/-- Sanity anchor 2 [eq:trivialchain], verbatim: "trivially N₀ˢ ≤ N₀* ≤ N₀ ≤ N,
-N₀ˢ ≤ Nˢ ≤ N_d ≤ N". Needs the seam facts (finiteness of the window; m_ρ ≥ 1), nothing from the
-paper. -/
-theorem trivial_chain (hs : ZetaSeam) (T₁ T₂ : ℝ) :
-    N0simple T₁ T₂ ≤ N0star T₁ T₂ ∧ N0star T₁ T₂ ≤ N0 T₁ T₂ ∧ N0 T₁ T₂ ≤ Ncount T₁ T₂ ∧
-    N0simple T₁ T₂ ≤ Nsimple T₁ T₂ ∧ Nsimple T₁ T₂ ≤ Ndist T₁ T₂ ∧ Ndist T₁ T₂ ≤ Ncount T₁ T₂ := by
-  simpa using (zetaZeros hs).trivial_chain T₁ T₂
-
 /-! ## 4. Theorems A, B, C
 
 The headline theorems Zeta23.thmA, thmA_cumulative, thmA_lam, thmB, thmB_cumulative, thmB_lam, thmC,
@@ -177,17 +117,5 @@ and for λ < 1 the factor loglog T may be omitted. In particular
 Formal target: the ε-forms, for each fixed λ ∈ (0,1) with constant
 H(λ) (resp. 2F(λ)−1, F(λ)), which absorb c(λ)/log T; then the 2/3 (resp. 1/2, 3/4) forms via
 sup_{λ<1} H(λ) = H(1) = 2/3 etc. The effective c(λ) forms are not stated. -/
-
-/-- The statement of Theorem A (2/3, dyadic ε-form) as a Prop, for reference; Zeta23.thmA proves it. -/
-def ThmA_statement : Prop :=
-  ∀ ε > 0, ∃ T₀ : ℝ, ∀ T ≥ T₀, (2 / 3 - ε) * (Ncount T (2 * T) : ℝ) ≤ N0star T (2 * T)
-
-/-- The statement of Theorem B (1/2, dyadic ε-form). -/
-def ThmB_statement : Prop :=
-  ∀ ε > 0, ∃ T₀ : ℝ, ∀ T ≥ T₀, (1 / 2 - ε) * (Ncount T (2 * T) : ℝ) ≤ N0simple T (2 * T)
-
-/-- The statement of Theorem C (3/4, dyadic ε-form). -/
-def ThmC_statement : Prop :=
-  ∀ ε > 0, ∃ T₀ : ℝ, ∀ T ≥ T₀, (3 / 4 - ε) * (Ncount T (2 * T) : ℝ) ≤ Ndist T (2 * T)
 
 end Zeta23

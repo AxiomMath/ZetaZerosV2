@@ -370,51 +370,6 @@ theorem primeNegativeCoeff_weighted_tsum_le
     (primeNegativeCoeff_weighted_summable x hx)
     (primePositiveCoeff_weighted_summable x hx)
 
-/-- Both one-sided prime Dirichlet series satisfy Montgomery--Vaughan mean-value estimates
-with the quantitative weighted-prime error. -/
-theorem exists_primeCoeff_meanValue_bounds :
-    ∃ M : ℝ, 0 < M ∧ ∀ x : ℝ, 1 ≤ x → ∀ T : ℝ,
-      |(∫ t in 0..T, ‖dirichletSeries (primePositiveCoeff x) t‖ ^ 2) -
-          T * ∑' k : ℕ, ‖primePositiveCoeff x k‖ ^ 2| ≤
-          M * x * (1 + Real.log x) ∧
-      |(∫ t in 0..T, ‖dirichletSeries (primeNegativeCoeff x) t‖ ^ 2) -
-          T * ∑' k : ℕ, ‖primeNegativeCoeff x k‖ ^ 2| ≤
-          M * x * (1 + Real.log x) := by
-  obtain ⟨C, hC, hmean⟩ := exists_dirichletSeries_meanValue_bound_real
-  obtain ⟨K, hK, hprime⟩ := pairWeightedPrimeMeanSquare_bound
-  refine ⟨C * K, mul_pos hC hK, ?_⟩
-  intro x hx T
-  obtain ⟨hweighted, hweightedBound⟩ := hprime x hx
-  have hC0 : 0 ≤ C := hC.le
-  have hp := hmean (primePositiveCoeff x)
-    (primePositiveCoeff_summable x hx)
-    (primePositiveCoeff_weighted_summable x hx) T
-  have hm := hmean (primeNegativeCoeff x)
-    (primeNegativeCoeff_summable x hx)
-    (primeNegativeCoeff_weighted_summable x hx) T
-  constructor
-  · calc
-      |(∫ t in 0..T, ‖dirichletSeries (primePositiveCoeff x) t‖ ^ 2) -
-          T * ∑' k : ℕ, ‖primePositiveCoeff x k‖ ^ 2| ≤
-          C * ∑' k : ℕ,
-            ((k : ℝ) + 1) * ‖primePositiveCoeff x k‖ ^ 2 := hp
-      _ = C * pairWeightedPrimeMeanSquare x := by
-        rw [primePositiveCoeff_weighted_tsum_eq x hx]
-      _ ≤ C * (K * x * (1 + Real.log x)) :=
-        mul_le_mul_of_nonneg_left hweightedBound hC0
-      _ = (C * K) * x * (1 + Real.log x) := by ring
-  · calc
-      |(∫ t in 0..T, ‖dirichletSeries (primeNegativeCoeff x) t‖ ^ 2) -
-          T * ∑' k : ℕ, ‖primeNegativeCoeff x k‖ ^ 2| ≤
-          C * ∑' k : ℕ,
-            ((k : ℝ) + 1) * ‖primeNegativeCoeff x k‖ ^ 2 := hm
-      _ ≤ C * pairWeightedPrimeMeanSquare x :=
-        mul_le_mul_of_nonneg_left
-          (primeNegativeCoeff_weighted_tsum_le x hx) hC0
-      _ ≤ C * (K * x * (1 + Real.log x)) :=
-        mul_le_mul_of_nonneg_left hweightedBound hC0
-      _ = (C * K) * x * (1 + Real.log x) := by ring
-
 /-- The prime-power term is exactly the sum of its positive- and negative-frequency
 Dirichlet-series halves. -/
 theorem fullZeroPrimeTerm_eq_primeModelSeries
@@ -522,17 +477,6 @@ theorem norm_primeModelSeries_le (x : ℝ) (hx : 1 ≤ x) (t : ℝ) :
         (norm_dirichletSeries_le_tsum _ (primePositiveCoeff_summable x hx) t)
         (norm_dirichletSeries_le_tsum _ (primeNegativeCoeff_summable x hx) (-t))
 
-/-- The prime model is integrable on every positive finite window. -/
-theorem integrableOn_primeModelSeries_Ioc
-    (x : ℝ) (hx : 1 ≤ x) (T : ℝ) :
-    IntegrableOn (primeModelSeries x) (Set.Ioc 0 T) := by
-  apply IntegrableOn.of_bound measure_Ioc_lt_top
-    (measurable_primeModelSeries x).aestronglyMeasurable
-    ((∑' n, ‖primePositiveCoeff x n‖) +
-      ∑' n, ‖primeNegativeCoeff x n‖)
-  filter_upwards [] with t
-  exact norm_primeModelSeries_le x hx t
-
 /-- The original prime-power side inherits measurability from its Dirichlet-series model. -/
 theorem measurable_fullZeroPrimeTerm (x : ℝ) (hx : 1 ≤ x) :
     Measurable (fullZeroPrimeTerm x) := by
@@ -549,16 +493,6 @@ theorem measurable_fullZeroPrimeTerm_joint :
   apply Measurable.tsum
   intro n
   fun_prop
-
-/-- The original prime-power side is integrable on every positive finite window. -/
-theorem integrableOn_fullZeroPrimeTerm_Ioc
-    (x : ℝ) (hx : 1 ≤ x) (T : ℝ) :
-    IntegrableOn (fullZeroPrimeTerm x) (Set.Ioc 0 T) := by
-  have hfun : fullZeroPrimeTerm x = primeModelSeries x := by
-    funext t
-    exact fullZeroPrimeTerm_eq_primeModelSeries x hx t
-  rw [hfun]
-  exact integrableOn_primeModelSeries_Ioc x hx T
 
 /-- The Archimedean side of Montgomery's explicit formula. -/
 noncomputable def fullZeroArchimedeanTerm (x t : ℝ) : ℂ :=
@@ -905,8 +839,6 @@ theorem aestronglyMeasurable_windowedFullZeroSecondMoment_rpow
     Real.one_le_rpow (by linarith [hT]) ha.1
   exact (windowedFullZeroSecondMoment_eq_setIntegral_terms
     (T ^ a) T hx).symm
-
-
 
 open Complex MeasureTheory Filter
 open scoped BigOperators ComplexConjugate Interval Topology
@@ -1336,6 +1268,5 @@ theorem exists_fullZeroPrimeTerm_meanValue_bound :
   refine ⟨M, hM, ?_⟩
   intro x hx T
   simpa only [fullZeroPrimeTerm_eq_primeModelSeries x hx] using hmean x hx T
-
 
 end ZetaZeros.Unconditional.PairCorrelationProof

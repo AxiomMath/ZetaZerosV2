@@ -17,7 +17,6 @@ namespace WeilEF
 open Complex MeasureTheory
 open scoped ArithmeticFunction
 
-
 /-- Mirror identity: the left-line test factor is the right-line factor of the reflected test
 function: H_k(1 − c − it) = H_{k∘neg}(c + it). -/
 theorem Hfn_mirror (k : ℝ → ℂ) (c t : ℝ) :
@@ -264,10 +263,6 @@ theorem EF_lit_zeta (hs : ZetaSeam) : Zeta23.EF.EF_lit (zetaZeros hs) := by
           ring
         rw [hζboth]
         ring
-
-/-- **Hypothesis-free form**: [eq:EFstd] holds for the canonical
-unconditional ζ zero configuration. -/
-theorem EF_lit_zetaZeroConfig : Zeta23.EF.EF_lit zetaZeroConfig := EF_lit_zeta zetaSeam
 
 end WeilEF
 end Zeta23

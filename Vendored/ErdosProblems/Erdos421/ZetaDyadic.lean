@@ -42,25 +42,4 @@ theorem zetaBlock_one_dyadic_trivial_bound (L : ℕ) (s : ℂ) (hs : 0 ≤ s.re)
       exact_mod_cast Nat.pow_le_pow_right (by omega : 0 < 2) (Finset.mem_range.mp hj).le
     _ = _ := by simp only [Finset.sum_const, Finset.card_range, nsmul_eq_mul]
 
-theorem zetaBlock_uniform_strip_bound {M N : ℕ} (hM : 0 < M) (hN : N ≤ M)
-    (R K : ℕ) (hK : 2 * R + 4 ≤ K) (s : ℂ) (hs : 0 ≤ s.re)
-    (hstrip : 1 - s.re ≤ logarithmicSavingExponent R K / 2)
-    (hlo : (M : ℝ) ^ (2 / (K : ℝ)) ≤ |s.im|) (hhi : |s.im| ≤ (M : ℝ) ^ (R + 1)) :
-    ‖zetaBlock M N s‖ ≤ 4 * logarithmicSavingConstant R *
-      (M : ℝ) ^ (-logarithmicSavingExponent R K / 2) := by
-  have hMp : (0 : ℝ) < M := by exact_mod_cast hM
-  have hM1 : (1 : ℝ) ≤ M := by exact_mod_cast hM
-  have hc := logarithmicSavingConstant_pos R
-  have hb := zetaBlock_uniform_norm_bound hM hN R K hK s hs hlo hhi
-  rw [logarithmicPowerSaving_eq hM R K] at hb
-  have he : 4 * (M : ℝ) ^ (1 - s.re) *
-      (logarithmicSavingConstant R / (M : ℝ) ^ logarithmicSavingExponent R K) =
-      4 * logarithmicSavingConstant R *
-        (M : ℝ) ^ ((1 - s.re) - logarithmicSavingExponent R K) := by
-    rw [Real.rpow_sub hMp (1 - s.re) (logarithmicSavingExponent R K)]
-    ring
-  rw [he] at hb
-  exact hb.trans (mul_le_mul_of_nonneg_left
-    (Real.rpow_le_rpow_of_exponent_le hM1 (by linarith)) (by positivity))
-
 end Erdos421

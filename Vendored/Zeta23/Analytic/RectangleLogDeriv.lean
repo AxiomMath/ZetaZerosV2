@@ -138,22 +138,6 @@ theorem residueTheorem_finset {f : ℂ → ℂ} {z w : ℂ} (hre : z.re ≤ w.re
     show RectangleIntegral' f₂ z w + RectangleIntegral' P z w = _
     rw [ih', ResidueTheoremInRectangle hre him hp, add_comm]
 
-/-- The zero set of a function analytic on a neighbourhood of every point of a rectangle and
-nonvanishing at one of its points is finite. -/
-theorem finite_zeros_rectangle {f : ℂ → ℂ} {z w : ℂ} (hf : AnalyticOnNhd ℂ f (Rectangle z w))
-    {x : ℂ} (hx : x ∈ Rectangle z w) (hfx : f x ≠ 0) :
-    (Rectangle z w ∩ f ⁻¹' {0}).Finite := by
-  have hconv : Convex ℝ (Rectangle z w) := by
-    rw [rectangle_eq_convexHull]; exact convex_convexHull ℝ _
-  have hcomp : IsCompact (Rectangle z w) := isCompact_uIcc.reProdIm isCompact_uIcc
-  refine IsCompact.finite ?_ ?_
-  · exact hcomp.of_isClosed_subset
-      (hf.continuousOn.preimage_isClosed_of_isClosed hcomp.isClosed isClosed_singleton)
-      inter_subset_left
-  · rw [inter_comm]
-    exact isDiscrete_of_codiscreteWithin
-      (hf.preimage_zero_mem_codiscreteWithin hfx hx ⟨⟨x, hx⟩, hconv.isPreconnected⟩)
-
 /-! ## Meromorphic version: finitely many zeros AND poles inside the rectangle
 
 Intended for f = completedRiemannZeta (simple poles at 0 and 1, residues ∓1):
@@ -359,28 +343,6 @@ theorem rectangleIntegral'_mul_logDeriv {f g : ℂ → ℂ} {z w : ℂ} (hre : z
   have h := rectangleIntegral'_mul_logDeriv_of_poles hre him Z ∅ (Finset.disjoint_empty_right _)
     (by simp) (by simpa using hf) hg hborder (by simpa using hZ) hZsub (fun _ => 0) (by simp)
   simpa using h
-
-/-- **Weighted argument principle, self-contained form**: as `rectangleIntegral'_mul_logDeriv`, with
-the finite zero set produced rather than supplied. -/
-theorem rectangleIntegral'_mul_logDeriv' {f g : ℂ → ℂ} {z w : ℂ} (hre : z.re ≤ w.re)
-    (him : z.im ≤ w.im)
-    (hf : AnalyticOnNhd ℂ f (Rectangle z w)) (hg : AnalyticOnNhd ℂ g (Rectangle z w))
-    (hborder : ∀ s ∈ RectangleBorder z w, f s ≠ 0) :
-    RectangleIntegral' (fun s => g s * logDeriv f s) z w
-      = ∑ ρ ∈ (finite_zeros_rectangle hf (rectangleBorder_subset_rectangle z w
-          (show z ∈ RectangleBorder z w from Or.inl (Or.inl (Or.inl ⟨left_mem_uIcc, rfl⟩))))
-          (hborder z (Or.inl (Or.inl (Or.inl ⟨left_mem_uIcc, rfl⟩))))).toFinset,
-        (analyticOrderNatAt f ρ : ℂ) * g ρ := by
-  classical
-  set hfin := finite_zeros_rectangle hf (rectangleBorder_subset_rectangle z w
-    (show z ∈ RectangleBorder z w from Or.inl (Or.inl (Or.inl ⟨left_mem_uIcc, rfl⟩))))
-    (hborder z (Or.inl (Or.inl (Or.inl ⟨left_mem_uIcc, rfl⟩))))
-  refine rectangleIntegral'_mul_logDeriv hre him hf hg hborder hfin.toFinset ?_ ?_
-  · intro s hs
-    simp [Set.Finite.mem_toFinset, hs]
-  · intro s hs
-    exact ((Set.Finite.mem_toFinset _).mp hs).1
-
 
 end Analytic
 end Zeta23

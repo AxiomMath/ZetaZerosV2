@@ -353,6 +353,5 @@ theorem good_heights : ∃ Cg : ℝ, 0 < Cg ∧ ∃ R : ℕ → ℝ, ∀ j : ℕ
     obtain ⟨h3, h4⟩ := hs3 s him h1 h2
     exact ⟨h3, by rwa [e3] at h4⟩
 
-
 end WeilEF
 end Zeta23

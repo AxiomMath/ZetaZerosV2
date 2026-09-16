@@ -24,9 +24,6 @@ namespace RvM
 def reZeroSet (T : ℝ) : Set ℝ :=
   {σ | σ ∈ Set.Icc (1/2 : ℝ) 2 ∧ (riemannZeta (σ + T * I)).re = 0}
 
-lemma mem_reZeroSet {T σ : ℝ} :
-    σ ∈ reZeroSet T ↔ σ ∈ Set.Icc (1/2 : ℝ) 2 ∧ (riemannZeta (σ + T * I)).re = 0 := Iff.rfl
-
 end RvM
 end Zeta23
 

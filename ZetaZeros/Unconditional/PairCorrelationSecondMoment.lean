@@ -304,16 +304,6 @@ theorem finiteWindowLorentzianSum_mul_conj_integrable (x T : ℝ) :
   intro rho' hrho'
   exact (zeroLorentzian_mul_integrable hrho hrho').const_mul _
 
-/-- The exact second moment written as an integral of the real squared norm. -/
-theorem finiteWindowLorentzianSum_norm_sq_secondMoment (x T : ℝ) :
-    (((∫ t : ℝ, ‖finiteWindowLorentzianSum x T t‖ ^ 2) : ℝ) : ℂ) =
-      2 * Real.pi * finitePairFunction x T := by
-  rw [← finiteWindowLorentzianSum_secondMoment]
-  rw [← integral_complex_ofReal]
-  apply integral_congr_ae
-  filter_upwards with t
-  rw [Complex.mul_conj, Complex.normSq_eq_norm_sq]
-
 /-- Stability of a squared complex norm under an additive perturbation. -/
 theorem norm_mul_conj_sub_mul_conj_le (z w : ℂ) :
     ‖z * (starRingEnd ℂ) z - w * (starRingEnd ℂ) w‖ ≤
@@ -330,74 +320,5 @@ theorem norm_mul_conj_sub_mul_conj_le (z w : ℂ) :
     _ = ‖z - w‖ * (‖z‖ + ‖w‖) := by
       simp only [norm_mul, Complex.norm_conj]
       ring
-
-/-- Quantitative transfer from a model for the zero-side function to Montgomery's finite
-pair function.  The two error terms respectively measure the model's second moment and the
-pointwise comparison with the finite zero sum. -/
-theorem finitePairFunction_normalized_sub_model_norm_le_of_comparison
-    (x T : ℝ) (N M : ℂ) (g : ℝ → ℂ) (B : ℝ → ℝ)
-    (E_main E_error : ℝ)
-    (hN : N ≠ 0)
-    (hg2 : Integrable (fun t ↦ g t * (starRingEnd ℂ) (g t)))
-    (hB : Integrable B)
-    (hcompare : ∀ t,
-      ‖finiteWindowLorentzianSum x T t - g t‖ *
-        (‖finiteWindowLorentzianSum x T t‖ + ‖g t‖) ≤ B t)
-    (hmain :
-      ‖(∫ t, g t * (starRingEnd ℂ) (g t)) -
-        ((2 * Real.pi : ℝ) : ℂ) * N * M‖ ≤
-          2 * Real.pi * ‖N‖ * E_main)
-    (hBint :
-      ∫ t, B t ≤ 2 * Real.pi * ‖N‖ * E_error) :
-    ‖finitePairFunction x T / N - M‖ ≤ E_main + E_error := by
-  let S : ℝ → ℂ := finiteWindowLorentzianSum x T
-  let I : ℂ := ∫ t, S t * (starRingEnd ℂ) (S t)
-  let J : ℂ := ∫ t, g t * (starRingEnd ℂ) (g t)
-  let c : ℂ := ((2 * Real.pi : ℝ) : ℂ)
-  have hS2 : Integrable (fun t ↦ S t * (starRingEnd ℂ) (S t)) :=
-    finiteWindowLorentzianSum_mul_conj_integrable x T
-  have hpoint (t : ℝ) :
-      ‖S t * (starRingEnd ℂ) (S t) -
-          g t * (starRingEnd ℂ) (g t)‖ ≤ B t :=
-    (norm_mul_conj_sub_mul_conj_le (S t) (g t)).trans (hcompare t)
-  have hcomparison : ‖I - J‖ ≤ ∫ t, B t := by
-    change ‖(∫ t, S t * (starRingEnd ℂ) (S t)) -
-      ∫ t, g t * (starRingEnd ℂ) (g t)‖ ≤ ∫ t, B t
-    rw [← integral_sub hS2 hg2]
-    exact norm_integral_le_of_norm_le hB
-      (Filter.Eventually.of_forall hpoint)
-  have hcpos : 0 < 2 * Real.pi := mul_pos (by norm_num) Real.pi_pos
-  have hNnorm : 0 < ‖N‖ := norm_pos_iff.mpr hN
-  have hdenpos : 0 < 2 * Real.pi * ‖N‖ := mul_pos hcpos hNnorm
-  have hcNnorm : ‖c * N‖ = 2 * Real.pi * ‖N‖ := by
-    norm_num [c, norm_mul, Real.norm_eq_abs, abs_of_pos Real.pi_pos]
-  have htotal : ‖I - c * N * M‖ ≤
-      2 * Real.pi * ‖N‖ * (E_main + E_error) := by
-    calc
-      ‖I - c * N * M‖ = ‖(J - c * N * M) + (I - J)‖ := by
-        congr 1
-        ring
-      _ ≤ ‖J - c * N * M‖ + ‖I - J‖ := norm_add_le _ _
-      _ ≤ 2 * Real.pi * ‖N‖ * E_main + ∫ t, B t :=
-        add_le_add hmain hcomparison
-      _ ≤ 2 * Real.pi * ‖N‖ * E_main +
-          2 * Real.pi * ‖N‖ * E_error := add_le_add (le_refl _) hBint
-      _ = 2 * Real.pi * ‖N‖ * (E_main + E_error) := by ring
-  have hidentity : finitePairFunction x T / N - M =
-      (I - c * N * M) / (c * N) := by
-    have hcne : c ≠ 0 := by
-      change (((2 * Real.pi : ℝ) : ℂ) ≠ 0)
-      exact_mod_cast ne_of_gt hcpos
-    dsimp only [I, S, c]
-    rw [finiteWindowLorentzianSum_secondMoment]
-    field_simp [hcne, hN]
-    push_cast
-    ring
-  rw [hidentity, norm_div, hcNnorm]
-  apply (div_le_iff₀ hdenpos).2
-  calc
-    ‖I - c * N * M‖ ≤
-        2 * Real.pi * ‖N‖ * (E_main + E_error) := htotal
-    _ = (E_main + E_error) * (2 * Real.pi * ‖N‖) := by ring
 
 end ZetaZeros.Unconditional.PairCorrelationProof

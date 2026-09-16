@@ -5,15 +5,6 @@ import ErdosProblems.Erdos421.PowerSavingAsymptotics
 
 namespace Erdos421
 
-theorem logarithmicSavingExponent_le_half (R : ℕ) {K : ℕ} (hK : 2 ≤ K) :
-    logarithmicSavingExponent R K ≤ 1 / 2 := by
-  have hKp : (0 : ℝ) < K := by exact_mod_cast (show 0 < K by omega)
-  have hK2 : (2 : ℝ) ≤ K := by exact_mod_cast hK
-  have hp : (1 : ℝ) ≤ ((2 ^ R : ℕ) : ℝ) := by exact_mod_cast (one_le_pow₀ (by omega : 1 ≤ 2))
-  unfold logarithmicSavingExponent
-  rw [inv_eq_one_div]
-  exact div_le_div_of_nonneg_left (by norm_num) (by norm_num) (by nlinarith)
-
 /-- The tail error is bounded independently of the height when the cutoff
 is at least one quarter of the square of an upper bound for the height. -/
 theorem zeta_tail_error_le_eight {N : ℕ} (hN : 0 < N) {B : ℝ} (hB : 2 ≤ B)

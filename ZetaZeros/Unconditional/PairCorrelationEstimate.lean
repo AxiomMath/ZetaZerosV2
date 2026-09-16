@@ -116,21 +116,6 @@ theorem fourierIntegral_rescaled_eq_pairPower (f : ℝ → ℝ) (T : ℝ) (z : �
   filter_upwards [] with a
   rw [fourierExponent_rescaled_eq_pairPower T a z hT]
 
-/-- Dividing the difference by two converts the pair kernel into the unit Lorentzian
-denominator used in the second-moment calculation. -/
-theorem finitePairKernel_eq_unitLorentzian (z : ℂ) :
-    finitePairKernel z = 1 / (1 - (z / 2) ^ 2) := by
-  unfold finitePairKernel
-  have hden : (1 : ℂ) - (z / 2) ^ 2 = (4 - z ^ 2) / 4 := by ring
-  rw [hden, one_div_div]
-
-/-- Equivalently, scaling a unit-Lorentzian argument by two gives the finite pair kernel. -/
-theorem finitePairKernel_two_mul (z : ℂ) :
-    finitePairKernel (2 * z) = 1 / (1 - z ^ 2) := by
-  rw [finitePairKernel_eq_unitLorentzian]
-  congr 2
-  ring
-
 /-- The finite pair kernel is even. -/
 @[simp] theorem finitePairKernel_neg (z : ℂ) :
     finitePairKernel (-z) = finitePairKernel z := by

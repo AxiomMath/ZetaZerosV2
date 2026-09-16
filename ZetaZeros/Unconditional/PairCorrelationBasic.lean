@@ -19,19 +19,6 @@ namespace ZetaZeros.Unconditional.PairCorrelationProof
 
 open Complex Set
 
-/-- Every bounded positive-ordinate window of nontrivial zeta zeros is finite. -/
-theorem nontrivialZeroWindow_finite (T : ℝ) :
-    { ρ : ℂ |
-      riemannZeta ρ = 0 ∧ 0 < ρ.re ∧ ρ.re < 1 ∧
-        0 < ρ.im ∧ ρ.im ≤ T }.Finite := by
-  simpa [Zeta23.zerosIn, Zeta23.IsNontrivialZero, and_assoc] using
-    Zeta23.zerosIn_finite 0 T
-
-/-- The natural analytic order used by the challenge is the vendored zero multiplicity. -/
-theorem analyticOrderNatAt_riemannZeta_eq_zeroMult (ρ : ℂ) :
-    analyticOrderNatAt riemannZeta ρ = Zeta23.zeroMult ρ := by
-  rfl
-
 /-- A doubly restricted `finsum` over a finite set is the corresponding nested `Finset.sum`.
 This is the finite-sum interchange interface used for the ordered pair of zeros. -/
 theorem nested_finsum_eq_finite_toFinset_sum {α M : Type*} [AddCommMonoid M]

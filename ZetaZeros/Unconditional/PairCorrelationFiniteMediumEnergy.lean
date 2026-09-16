@@ -120,7 +120,8 @@ theorem finiteMediumFullZeroLorentzianTail_norm_bound :
           rw [mem_finiteZeroCarrierWindow, mem_finiteZeroWindow]
           exact ⟨zero.property, lt_of_not_ge hlower, le_of_not_gt hupper⟩)
       (fun zero hzero ↦ (Finset.mem_filter.mp hzero).2.2)
-    simpa only [Finset.sum_filter, Zeta23.zetaZeros_mult] using hfinite
+    rw [← Finset.sum_filter]
+    exact hfinite
   have hpointwise : ∀ zero : (Zeta23.zetaZeros Zeta23.zetaSeam).carrier,
       ‖if zero ∉ finiteZeroCarrierWindow height ∧ |(zero : ℂ).im| ≤ cutoff then
         fullZeroLorentzianSummand scale time zero else 0‖ ≤

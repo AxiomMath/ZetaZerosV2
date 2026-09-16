@@ -10,12 +10,6 @@ open MeasureTheory
 
 noncomputable local instance : MeasureSpace UnitAddCircle := ⟨AddCircle.haarAddCircle⟩
 
-local instance : Measure.IsAddHaarMeasure (volume : Measure UnitAddCircle) :=
-  inferInstanceAs (Measure.IsAddHaarMeasure AddCircle.haarAddCircle)
-
-local instance : IsProbabilityMeasure (volume : Measure UnitAddCircle) :=
-  inferInstanceAs (IsProbabilityMeasure AddCircle.haarAddCircle)
-
 noncomputable def logFrequencyBox (k : ℕ) (t M z : ℝ) : Set (UnitAddTorus (Fin k)) :=
   torusBox (fun j ↦ (logTaylorCoefficients k t z j : UnitAddCircle)) (polynomialBoxRadius k M)
 
@@ -72,11 +66,5 @@ theorem logFrequencyBox_volume_real {k : ℕ} (hk : 0 < k) (t z : ℝ) {M : ℝ}
     (fun j ↦ (polynomialBoxRadius_pos hk (by linarith) j).le)
     (two_mul_polynomialBoxRadius_le_one hk hM)]
   exact polynomialBoxRadius_product hk (by linarith)
-
-theorem logFrequencyBox_volume_pos {k : ℕ} (hk : 0 < k) (t z : ℝ) {M : ℝ} (hM : 1 ≤ M) :
-    0 < volume.real (logFrequencyBox k t M z) := by
-  rw [logFrequencyBox_volume_real hk t z hM]
-  have hf : (0 : ℝ) < k.factorial := Nat.cast_pos.mpr (Nat.factorial_pos k)
-  positivity
 
 end Erdos421

@@ -4,13 +4,15 @@ Copyright (c) 2026 Axiom Math.
 This product includes software derived from the `zeta23/` project of
 anthropics/formal-math (https://github.com/anthropics/formal-math), Copyright (c) 2026
 Anthropic, PBC, licensed under the Apache License, Version 2.0. The derived files are the
-ones under `Vendored/Zeta23/`; they carry only the small compatibility edits needed for this
-repository's Mathlib version, principally updated theorem names for pointwise functions. The
-vendored subset consists only of the classical analytic inputs of
+ones under `Vendored/Zeta23/`. They have been adapted to this repository's Mathlib version
+and pruned at declaration granularity to the dependencies of the unconditional results.
+Some surviving proof scripts are simplified to avoid otherwise unused helper lemmas. The
+vendored subset consists of the classical analytic inputs of
 that project (the Riemann--von Mangoldt formula and local zero count, Weil's explicit formula,
 the Montgomery--Vaughan Hilbert inequality, Stirling-type facts for Gamma'/Gamma, the
-Chebyshev--Mertens prime sums, and the reflection symmetry of zero multiplicities); nothing
-from its rank--trace / Gram-matrix proof mechanism is included. See `Vendored/Zeta23.lean`.
+Chebyshev--Mertens prime sums, and the reflection symmetry of zero multiplicities), together
+with the spectral-calculus and zero-tail helpers needed by those inputs. The headline
+rank--trace / Gram-matrix argument is not imported. See `Vendored/Zeta23.lean`.
 
 Some of those files (under `Vendored/Zeta23/FromPNTPlus/`) in turn derive from
 PrimeNumberTheoremAnd (https://github.com/AlexKontorovich/PrimeNumberTheoremAnd), Copyright
@@ -22,9 +24,17 @@ licensed under the Apache License, Version 2.0.
 The additional source files under `Vendored/ErdosProblems/Erdos421/` come from
 plby/lean-proofs (https://github.com/plby/lean-proofs), commit
 87b073cb8b00ffdd32cc6b84e89a7d9fcc6290fe, in `src/latest/ErdosProblems/Erdos421/`.
-The included subset is the 147-module source dependency closure of
+The included declarations are pruned from the source dependency closure of
 `Erdos421.riemannZeta_eventually_ne_zero_log_power_strip`. This theorem concerns
 Mathlib's Riemann zeta function and supplies the unconditional zero-free width
 c / (log |t|)^(15/16) used at the closed pair-correlation endpoint. The upstream
 `src/latest/LICENSE` notice is preserved verbatim in `Vendored/ErdosProblems/LICENSE`; the Lean
-sources carry only small Mathlib-compatibility edits.
+sources carry Mathlib-compatibility edits and have unused declarations removed.
+
+The pair-correlation development under `ZetaZeros/Unconditional/` and the
+Riemann--von Mangoldt bridge in `ZetaZeros/Zeta/RiemannVonMangoldt.lean` were ported from
+AxiomMath/ZetaZerosInternalOld (https://github.com/AxiomMath/ZetaZerosInternalOld),
+commit 6303d1a5e42d316674b0133b9cbd80956e592d89. That repository is an immediate source,
+not a claim of exclusive authorship: the individual files preserve their contributor
+and copyright notices, including Anthropic notices where present. These files are also
+pruned to the proof dependencies; `ZetaZeros/Unconditional.lean` supplies the V2 wrappers.

@@ -13,9 +13,6 @@ noncomputable local instance : MeasureSpace UnitAddCircle := ⟨AddCircle.haarAd
 local instance : Measure.IsAddHaarMeasure (volume : Measure UnitAddCircle) :=
   inferInstanceAs (Measure.IsAddHaarMeasure AddCircle.haarAddCircle)
 
-local instance : IsProbabilityMeasure (volume : Measure UnitAddCircle) :=
-  inferInstanceAs (IsProbabilityMeasure AddCircle.haarAddCircle)
-
 theorem integral_torusCharacter_mul_conj {k : ℕ} (m n : Fin k → ℤ) :
     (∫ a : UnitAddTorus (Fin k),
       UnitAddTorus.mFourier m a * conj (UnitAddTorus.mFourier n a)) =
@@ -113,13 +110,6 @@ theorem torusVinogradovWeylSum_moment (s k N : ℕ) :
   simpa only [sum_vinogradovIntegerPoint, torusVinogradovWeylSum, vinogradovCount,
     vinogradovSolutions, sub_eq_zero] using h
 
-theorem torusVinogradovWeylSum_complete_meanValue {k : ℕ} (hk : 2 ≤ k) (r N : ℕ) :
-    (∫ a : UnitAddTorus (Fin k), ‖torusVinogradovWeylSum k N a‖ ^ (2 * ((r + 1) * k))) ≤
-      (2 : ℝ) ^ (32 * (k + 1) ^ 5 * (r + 1) ^ 3) *
-        (N : ℝ) ^ meanValueExponent k r := by
-  rw [torusVinogradovWeylSum_moment]
-  exact vinogradovCount_complete_meanValue hk r N
-
 theorem torusCharacter_real_apply {k : ℕ} (n : Fin k → ℤ) (b : Fin k → ℝ) :
     UnitAddTorus.mFourier n (fun j ↦ (b j : UnitAddCircle)) =
       Complex.exp (2 * (Real.pi : ℂ) * Complex.I * ∑ j : Fin k, (n j : ℂ) * (b j : ℂ)) := by
@@ -140,13 +130,5 @@ theorem torusVinogradovWeylSum_real (k N : ℕ) (b : Fin k → ℝ) :
       realVinogradovWeylSum k N b := by
   simp only [torusVinogradovWeylSum, torusCharacterSum, torusCharacter_real_apply,
     realVinogradovWeylSum]
-
-theorem realVinogradovWeylSum_moment (s k N : ℕ) (b : Fin k → ℝ) :
-    (∫ a : Fin k → ℝ in {a | ∀ j, a j ∈ Set.Ioc (b j) (b j + 1)},
-      ‖realVinogradovWeylSum k N a‖ ^ (2 * s)) = (vinogradovCount s k N : ℝ) := by
-  have h := UnitAddTorus.integral_preimage
-    (fun a : UnitAddTorus (Fin k) ↦ ‖torusVinogradovWeylSum k N a‖ ^ (2 * s)) b
-  rw [torusVinogradovWeylSum_moment] at h
-  simpa only [torusVinogradovWeylSum_real] using h.symm
 
 end Erdos421

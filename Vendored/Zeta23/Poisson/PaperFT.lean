@@ -31,33 +31,6 @@ and their instance path (RCLike-derived `NormedAddCommGroup ℂ`) does not match
 directly-synthesized `Complex.instNormedAddCommGroup` under `rw`'s reducible unification.
 These ℂ-specialized restatements (same proofs) rewrite reliably. -/
 
-theorem integral_const_mul_C (r : ℂ) (f : ℝ → ℂ) : (∫ a, r * f a) = r * ∫ a, f a :=
-  integral_const_mul r f
-
-theorem integral_mul_const_C (r : ℂ) (f : ℝ → ℂ) : (∫ a, f a * r) = (∫ a, f a) * r :=
-  integral_mul_const r f
-
-/-- Convention dictionary: for REAL argument `s`,
-`h_f(s) = 𝓕 f (-s / (2π))` where `𝓕` is Mathlib's Fourier transform. -/
-theorem paperFT_ofReal_eq_fourier (f : ℝ → ℂ) (s : ℝ) :
-    paperFT f s = 𝓕 f (-s / (2 * π)) := by
-  rw [Real.fourier_real_eq_integral_exp_smul]
-  unfold paperFT
-  congr 1 with u
-  rw [smul_eq_mul, mul_comm (f u)]
-  congr 1
-  congr 1
-  push_cast
-  field_simp
-
-/-- Equivalent form of the dictionary: `𝓕 f w = h_f(-2π w)`. -/
-theorem fourier_eq_paperFT (f : ℝ → ℂ) (w : ℝ) :
-    𝓕 f w = paperFT f (-(2 * π * w)) := by
-  have := paperFT_ofReal_eq_fourier f (-(2 * π * w))
-  push_cast at this ⊢
-  rw [this]
-  field_simp
-
 /-! ### [eq:hfbound]
 
 "`|h_f(x+iy)| ≤ e^{|y|Λ_f} min(‖f‖₁, ‖f''‖₁ |x+iy|⁻²)`, `supp f ⊂ [−Λ_f, Λ_f]`, by two integrations

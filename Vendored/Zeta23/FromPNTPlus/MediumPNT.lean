@@ -45,9 +45,6 @@ theorem psi_eq_sum_range (x : ℝ) :
 
 end Chebyshev
 
-noncomputable abbrev ChebyshevPsi (x : ℝ) : ℝ :=
-  Chebyshev.psi x
-
 theorem LogDerivativeDirichlet (s : ℂ) (hs : 1 < s.re) :
     - deriv riemannZeta s / riemannZeta s = ∑' n, Λ n / (n : ℂ) ^ s := by
   rw [← ArithmeticFunction.LSeries_vonMangoldt_eq_deriv_riemannZeta_div hs]
@@ -830,13 +827,6 @@ theorem SmoothedChebyshevPull1_aux_integrable {SmoothingF : ℝ → ℝ} {ε : �
       norm_cast
       linarith
 
-lemma BddAboveOnRect {g : ℂ → ℂ} {z w : ℂ} (holoOn : HolomorphicOn g (z.Rectangle w)) :
-    BddAbove (norm ∘ g '' (z.Rectangle w)) := by
-  have compact_rect : IsCompact (z.Rectangle w) := by
-    apply IsCompact.reProdIm <;> apply isCompact_uIcc
-  refine IsCompact.bddAbove_image compact_rect ?_
-  apply holoOn.continuousOn.norm
-
 theorem SmoothedChebyshevPull1 {SmoothingF : ℝ → ℝ} {ε : ℝ} (ε_pos : 0 < ε)
     (ε_lt_one : ε < 1)
     (X : ℝ) (X_gt : 3 < X)
@@ -1251,26 +1241,6 @@ theorem SmoothedChebyshevPull2 {SmoothingF : ℝ → ℝ} {ε : ℝ} (ε_pos : 0
     + I₆ SmoothingF ε X σ₁ σ₂
     + I₇ SmoothingF ε T X σ₁ := by
       ring
-
-theorem ZetaBoxEval {SmoothingF : ℝ → ℝ}
-    (suppSmoothingF : Function.support SmoothingF ⊆ Icc (1 / 2) 2)
-    (mass_one : ∫ x in Ioi 0, SmoothingF x / x = 1)
-    (ContDiffSmoothingF : ContDiff ℝ 1 SmoothingF) :
-    ∃ C, ∀ᶠ ε in (nhdsWithin 0 (Ioi 0)), ∀ X : ℝ, 0 ≤ X →
-    ‖𝓜 (fun x ↦ (Smooth1 SmoothingF ε x : ℂ)) 1 * X - X‖ ≤ C * ε * X := by
-  have := MellinOfSmooth1c ContDiffSmoothingF suppSmoothingF mass_one
-  clear suppSmoothingF mass_one ContDiffSmoothingF
-  rw[Asymptotics.isBigO_iff] at this
-  obtain ⟨C, hC⟩ := this
-  use C
-  have εpos : ∀ᶠ (ε : ℝ) in nhdsWithin 0 (Ioi 0), ε > 0 :=
-    eventually_mem_of_tendsto_nhdsWithin fun ⦃U⦄ hU ↦ hU
-  filter_upwards [hC, εpos] with ε hC εpos
-  rw[id_eq, norm_of_nonneg (le_of_lt εpos)] at hC
-  intro X Xnne
-  nth_rw 2 [← one_mul (X : ℂ)]
-  rw[← sub_mul, norm_mul, norm_real, norm_of_nonneg Xnne]
-  exact mul_le_mul_of_nonneg_right hC Xnne
 
 theorem poisson_kernel_integrable (x : ℝ) (hx : x ≠ 0) :
   MeasureTheory.Integrable (fun (t : ℝ) ↦ (‖x + t * I‖^2)⁻¹) := by

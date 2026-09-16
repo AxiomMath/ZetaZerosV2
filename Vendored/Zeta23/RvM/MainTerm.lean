@@ -40,7 +40,6 @@ noncomputable section
 
 namespace Zeta23.RvM
 
-
 /-- (M2)+(M3): the folded argument principle. For zero-free ordinates 1 ≤ T₁ < T₂:
 N(T₁,T₂) = (1/π)·Im ∫_L Λ'/Λ ds, L the right half-contour.  [Tit86 §9.3; fold by Λ(1−s̄) = conj Λ(s)] -/
 theorem N_eq_halfContour_completedZeta {T₁ T₂ : ℝ} (h1 : 1 ≤ T₁) (h12 : T₁ < T₂)
@@ -189,7 +188,6 @@ theorem halfContour_completedZeta_split {T₁ T₂ : ℝ} (h1 : 1 ≤ T₁) (h12
     intervalIntegral.integral_add (hintb T₂ (by linarith) hg2) (hintbΓ T₂ (by linarith) hg2),
     intervalIntegral.integral_add hintr hintrΓ]
   ring
-
 
 /-- Zero-free ordinates are dense enough: every interval [a, a+1] (a ≥ 0) contains one
 (finitely many ordinates per window, Zeta23.zerosIn_finite). -/

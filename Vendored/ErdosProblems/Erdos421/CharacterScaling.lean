@@ -6,10 +6,6 @@ namespace Erdos421
 
 variable {q k : ℕ} [NeZero q]
 
-theorem norm_vectorCharacter (a v : Fin k → ZMod q) : ‖vectorCharacter a v‖ = 1 := by
-  simp only [vectorCharacter, norm_prod, ZMod.stdAddChar_apply, Circle.norm_coe,
-    Finset.prod_const_one]
-
 theorem vectorCharacter_scale (a v : Fin k → ZMod q) (c : ZMod q) :
     vectorCharacter a (fun j ↦ c * v j) = vectorCharacter (fun j ↦ c * a j) v := by
   unfold vectorCharacter

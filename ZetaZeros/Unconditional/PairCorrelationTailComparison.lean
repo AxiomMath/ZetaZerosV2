@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Anthropic PBC
 -/
 import ZetaZeros.Unconditional.PairCorrelationSharpComparison
-import ZetaZeros.Unconditional.PairCorrelationLocalCount
+import ZetaZeros.Unconditional.PairCorrelationZeroSum
 
 /-!
 # Quantitative tails for the Lorentzian zero sum

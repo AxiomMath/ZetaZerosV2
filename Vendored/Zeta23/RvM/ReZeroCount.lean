@@ -353,12 +353,4 @@ theorem reZeroSet_card_le : ∃ C T₀ : ℝ, ∀ T : ℝ, T₀ ≤ T →
   obtain ⟨A, C, hC, hgrowth⟩ := zeta_growth_right
   exact ⟨_, 4, reZeroSet_card_le_of_growth hC hgrowth⟩
 
-/-- explicit form at zeta_growth_right_at's literal data (A, C) = (1, 20/3):
-ncard ≤ (1/log(0.9/0.8))·(|log 40| + 2)·log T (≈ 48.3·log T) for T ≥ 4. -/
-theorem reZeroSet_card_le_at : ∀ T : ℝ, 4 ≤ T →
-    (reZeroSet T).Finite ∧ ((reZeroSet T).ncard : ℝ)
-      ≤ (1 / Real.log ((0.9 : ℝ) / 0.8) * (|Real.log (6 * (20 / 3 : ℝ))| + 2 * max (1 : ℝ) 0))
-        * Real.log T :=
-  reZeroSet_card_le_of_growth (A := 1) (C := 20 / 3) (by norm_num) zeta_growth_right_at
-
 end Zeta23.RvM

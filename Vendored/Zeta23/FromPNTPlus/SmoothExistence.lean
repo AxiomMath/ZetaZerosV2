@@ -53,7 +53,6 @@ lemma smooth_urysohn_support_Ioo {a b c d : ℝ} (h1 : a < b) (h3 : c < d) :
   · ext x
     simp only [Function.mem_support, ne_eq, mem_Ioo, ← hΨ0, not_or, not_le]
 
-
 lemma SmoothExistence :
     ∃ (ν : ℝ → ℝ), (ContDiff ℝ ∞ ν) ∧ (∀ x, 0 ≤ ν x) ∧
     ν.support ⊆ Icc (1 / 2) 2 ∧ ∫ x in Ici 0, ν x / x = 1 := by

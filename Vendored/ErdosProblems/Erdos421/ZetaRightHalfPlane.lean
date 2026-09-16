@@ -36,11 +36,6 @@ theorem norm_LSeries_le_of_coeff_norm_le_one {f : ℕ → ℂ} {s : ℂ}
       Summable.tsum_le_tsum hterm ((summable_nat_add_iff 1).mpr hnorm) hp
     _ ≤ _ := positive_integer_rpow_sum_le hs
 
-theorem norm_riemannZeta_right_halfPlane_le {s : ℂ} (hs : 1 < s.re) :
-    ‖riemannZeta s‖ ≤ 1 + 1 / (s.re - 1) := by
-  rw [← LSeries_one_eq_riemannZeta hs]
-  exact norm_LSeries_le_of_coeff_norm_le_one (by simp) hs
-
 theorem norm_inv_riemannZeta_right_halfPlane_le {s : ℂ} (hs : 1 < s.re) :
     ‖(riemannZeta s)⁻¹‖ ≤ 1 + 1 / (s.re - 1) := by
   let m : ℕ → ℂ := fun n ↦ (ArithmeticFunction.moebius n : ℂ)

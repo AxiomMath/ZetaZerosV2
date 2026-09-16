@@ -36,17 +36,4 @@ def halfContour (F : ℂ → ℂ) (T₁ T₂ : ℝ) : ℂ :=
   (∫ σ in (1/2:ℝ)..2, F (σ + T₁ * I)) + (∫ t in T₁..T₂, F (2 + t * I)) * I
     - ∫ σ in (1/2:ℝ)..2, F (σ + T₂ * I)
 
-lemma halfContour_add (F G : ℂ → ℂ) (T₁ T₂ : ℝ)
-    (hb : IntervalIntegrable (fun σ : ℝ => F (σ + T₁ * I)) MeasureTheory.volume (1/2) 2)
-    (hb' : IntervalIntegrable (fun σ : ℝ => G (σ + T₁ * I)) MeasureTheory.volume (1/2) 2)
-    (hr : IntervalIntegrable (fun t : ℝ => F (2 + t * I)) MeasureTheory.volume T₁ T₂)
-    (hr' : IntervalIntegrable (fun t : ℝ => G (2 + t * I)) MeasureTheory.volume T₁ T₂)
-    (ht : IntervalIntegrable (fun σ : ℝ => F (σ + T₂ * I)) MeasureTheory.volume (1/2) 2)
-    (ht' : IntervalIntegrable (fun σ : ℝ => G (σ + T₂ * I)) MeasureTheory.volume (1/2) 2) :
-    halfContour (fun s => F s + G s) T₁ T₂ = halfContour F T₁ T₂ + halfContour G T₁ T₂ := by
-  unfold halfContour
-  rw [intervalIntegral.integral_add hb hb', intervalIntegral.integral_add hr hr',
-    intervalIntegral.integral_add ht ht']
-  ring
-
 end Zeta23.RvM

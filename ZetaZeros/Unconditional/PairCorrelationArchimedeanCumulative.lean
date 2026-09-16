@@ -20,11 +20,6 @@ namespace ZetaZeros.Unconditional.PairCorrelationProof
 
 open MeasureTheory intervalIntegral
 
-/-- The square of the Archimedean density is measurable. -/
-theorem measurable_archimedeanDensity_sq :
-    Measurable (fun t : ℝ => Zeta23.mu t ^ 2) :=
-  (Zeta23.mu_smooth.continuous.pow 2).measurable
-
 /-- The square of the Archimedean density is integrable on every bounded interval. -/
 theorem intervalIntegrable_archimedeanDensity_sq (a b : ℝ) :
     IntervalIntegrable (fun t : ℝ => Zeta23.mu t ^ 2) volume a b :=

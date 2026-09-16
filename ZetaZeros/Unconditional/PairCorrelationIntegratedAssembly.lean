@@ -30,50 +30,6 @@ open Complex MeasureTheory Set
 noncomputable def integratedTestSize (f : ℝ → ℝ) (C : ℝ) : ℝ :=
   |f 0| + C + ∫ a : ℝ in 0..1, |f a|
 
-/-- A pointwise Montgomery--Vaughan remainder with its natural endpoint loss already has
-the normalized square-root-logarithmic size required by the integrated contracts.  This is
-the direct adapter from `norm_intervalIntegral_test_mul_hilbertError_le`; no pointwise
-uniform estimate at `a = 1` is asserted. -/
-theorem norm_intervalIntegral_test_mul_hilbertError_le_normalized
-    (f : ℝ → ℝ) (hf : Integrable f)
-    (C : ℝ) (hC : 0 ≤ C)
-    (hLip : ∀ x : ℝ, |x| ≤ 1 → |f x - f 0| ≤ C * |x|)
-    (E : ℝ → ℂ) (K : ℝ) (hK : 0 ≤ K)
-    (T : ℝ) (hT : Real.exp 1 ≤ T)
-    (hE : ∀ a : ℝ, 0 ≤ a → a ≤ 1 →
-      ‖E a‖ ≤ K * T ^ a * (1 + a * Real.log T)) :
-    ‖∫ a : ℝ in 0..1, (f a : ℂ) * E a‖ ≤
-      2 * Real.pi * ‖pairNormalization T‖ *
-        (2 * K * (|f 0| + C) / Real.sqrt (Real.log T)) := by
-  have hTpos : 0 < T := lt_of_lt_of_le (Real.exp_pos 1) hT
-  have hlogone : 1 ≤ Real.log T := (Real.le_log_iff_exp_le hTpos).2 hT
-  have hlognonneg : 0 ≤ Real.log T := le_trans zero_le_one hlogone
-  have hsqrtpos : 0 < Real.sqrt (Real.log T) :=
-    Real.sqrt_pos.2 (lt_of_lt_of_le zero_lt_one hlogone)
-  have hsqrtone : 1 ≤ Real.sqrt (Real.log T) := by
-    nlinarith [Real.sq_sqrt hlognonneg, Real.sqrt_nonneg (Real.log T)]
-  have hsize : 0 ≤ 2 * K * (|f 0| + C) * T := by positivity
-  have hnorm : 2 * Real.pi * ‖pairNormalization T‖ = T * Real.log T := by
-    rw [pairNormalization, Complex.norm_real, Real.norm_eq_abs]
-    rw [abs_of_pos]
-    · field_simp
-    · positivity
-  calc
-    ‖∫ a : ℝ in 0..1, (f a : ℂ) * E a‖ ≤
-        2 * K * (|f 0| + C) * T :=
-      norm_intervalIntegral_test_mul_hilbertError_le
-        f hf C hC hLip E K hK T hT hE
-    _ ≤ 2 * K * (|f 0| + C) * T * Real.sqrt (Real.log T) :=
-      le_mul_of_one_le_right hsize hsqrtone
-    _ = T * Real.log T *
-        (2 * K * (|f 0| + C) / Real.sqrt (Real.log T)) := by
-      field_simp [ne_of_gt hsqrtpos]
-      ring_nf
-      rw [Real.sq_sqrt hlognonneg]
-    _ = 2 * Real.pi * ‖pairNormalization T‖ *
-        (2 * K * (|f 0| + C) / Real.sqrt (Real.log T)) := by
-      rw [hnorm]
-
 /-- Integrated full-zero mean-square input.  Unlike `FullZeroModelSecondMoment`, this asks
 only for the weighted integral which is used downstream.  The universal constant `K` is
 independent of `f` and of its displayed Lipschitz constant `C`. -/

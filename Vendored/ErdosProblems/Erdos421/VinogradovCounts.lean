@@ -18,12 +18,6 @@ def vinogradovSolutions (s k N : ℕ) (w : Fin k → ℤ) :
 
 def vinogradovCount (s k N : ℕ) : ℕ := (vinogradovSolutions s k N 0).card
 
-theorem vinogradovSolutions_card_le_zero (s k N : ℕ) (w : Fin k → ℤ) :
-    (vinogradovSolutions s k N w).card ≤ vinogradovCount s k N := by
-  simpa only [Finset.univ_product_univ, vinogradovSolutions, vinogradovCount] using
-    card_difference_fiber_le_zero (Finset.univ : Finset (Fin s → Fin N))
-      (vinogradovSums k) w
-
 theorem vinogradov_power_sums_eq {s k N : ℕ} {x y : Fin s → Fin N}
     (hs : vinogradovSums k x = vinogradovSums k y) {j : ℕ} (hj : 0 < j) (hjk : j ≤ k) :
     (∑ i : Fin s, ((x i : ℤ) + 1) ^ j) = ∑ i : Fin s, ((y i : ℤ) + 1) ^ j := by

@@ -1,4 +1,4 @@
-import ErdosProblems.Erdos421.LogDifference
+import ErdosProblems.Erdos421.LogarithmicSums
 import Mathlib.Analysis.Calculus.Deriv.MeanValue
 import Mathlib.Data.Nat.Factorial.Basic
 

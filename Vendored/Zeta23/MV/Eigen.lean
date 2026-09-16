@@ -27,20 +27,6 @@ namespace MV
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι] {freq δ : ι → ℝ}
 
-/-- **Step 2, Preissmann–Lévêque identity.**  Only injectivity of `freq` and
-positivity of `c` are needed.  `heig` is the eigen-relation `(H u)_m = iμ u_m` for the
-skew-Hermitian `H_{mn} = c_m c_n/(freq m − freq n)`. -/
-theorem eigen_identity (hinj : Function.Injective freq) (c : ι → ℝ) (hc : ∀ r, 0 < c r)
-    (u : ι → ℂ) (μ : ℝ)
-    (heig : ∀ m, ∑ n ∈ Finset.univ.erase m,
-        ((c m * c n / (freq m - freq n) : ℝ) : ℂ) * u n = (μ : ℂ) * Complex.I * u m)
-    (m : ι) :
-    μ ^ 2 * ‖u m‖ ^ 2 =
-      (∑ n ∈ Finset.univ.erase m, (c m * c n) ^ 2 * ‖u n‖ ^ 2 / (freq m - freq n) ^ 2)
-      + 2 * ∑ n ∈ Finset.univ.erase m,
-          c m ^ 3 * c n * (u m * conj (u n)).re / (freq m - freq n) ^ 2 :=
-  eigen_identity' hinj c hc u μ heig m
-
 /-- **Step 3, eigenvalue bound**: every eigenvalue of the normalized matrix
 (`c = √δ`) with a unit eigenvector has `|μ| ≤ 13`. -/
 theorem eigen_bound (h : Adm freq δ) (u : ι → ℂ) (hu : ∑ n, ‖u n‖ ^ 2 = 1) (μ : ℝ)

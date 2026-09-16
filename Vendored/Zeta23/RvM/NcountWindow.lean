@@ -53,7 +53,6 @@ theorem Ncount_mono {a b c d : ℝ} (hca : c ≤ a) (hbd : b ≤ d) : Ncount a b
   rw [Set.Finite.mem_toFinset] at hρ ⊢
   exact hsub hρ
 
-
 end Zeta23
 
 end

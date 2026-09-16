@@ -12,9 +12,6 @@ noncomputable local instance : MeasureSpace UnitAddCircle := ⟨AddCircle.haarAd
 local instance : Measure.IsAddHaarMeasure (volume : Measure UnitAddCircle) :=
   inferInstanceAs (Measure.IsAddHaarMeasure AddCircle.haarAddCircle)
 
-local instance : IsProbabilityMeasure (volume : Measure UnitAddCircle) :=
-  inferInstanceAs (IsProbabilityMeasure AddCircle.haarAddCircle)
-
 def torusBox {k : ℕ} (c : UnitAddTorus (Fin k)) (d : Fin k → ℝ) :
     Set (UnitAddTorus (Fin k)) := Set.pi Set.univ (fun j ↦ Metric.closedBall (c j) (d j))
 

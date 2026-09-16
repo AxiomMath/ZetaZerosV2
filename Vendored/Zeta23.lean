@@ -19,9 +19,10 @@ import Zeta23.Statement.SeamClosed
 
 The modules under `Vendored/Zeta23/` are copied from the `zeta23/` project of
 anthropics/formal-math (Apache-2.0; see `NOTICE`), which formalizes Alpöge–Furman's proof.
-Only the *classical analytic inputs* are vendored: the Riemann–von Mangoldt formula with its
+The retained declarations supply the classical analytic inputs: the Riemann–von Mangoldt formula with its
 local zero count, the Weil explicit formula, the Montgomery–Vaughan Hilbert inequality, the
 Stirling-type facts for `Γ'/Γ`, Chebyshev–Mertens prime sums, and the reflection symmetry of
-zero multiplicities. Nothing from the rank–trace / Gram-matrix mechanism of that proof
-(`LinAlg`, `ZeroSide`, `PrimeSide*`, `Taper`, `Tail`, `Assembly`, `ThmD`, `ThmE`) is included.
+zero multiplicities. Necessary spectral-calculus and zero-tail helpers are retained from
+`LinAlg` and `Tail`; the headline rank–trace / Gram-matrix argument is not imported.
+Unused declarations within the imported modules have been removed.
 -/

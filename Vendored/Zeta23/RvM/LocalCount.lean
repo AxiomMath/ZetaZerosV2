@@ -27,7 +27,6 @@ import Zeta23.FromPNTPlus.StrongPNTPrefix
 import Zeta23.RvM.ZetaGrowth
 import Zeta23.RvM.Halving
 
-
 open Complex Set Filter Topology Metric
 
 noncomputable section
@@ -76,18 +75,6 @@ lemma analyticOrderNatAt_gfun {s₀ c u w : ℂ} (hc : c ≠ 0) (hu : u ≠ 0) (
     rw [deriv_const_add, deriv_const_mul _ differentiableAt_id, deriv_id'']; simpa using hc
   have := analyticOrderAt_comp_of_deriv_ne_zero (f := riemannZeta) haff hderiv
   simpa [Function.comp_def] using this
-
-/-- ‖z‖ ≤ |Re z| + |Im z| packaged for the window geometry: a point ρ with 0 < Re ρ < 1 and
-t < Im ρ ≤ t + 1 lies within distance 3 of 2 + it. -/
-lemma norm_sub_center_le {ρ : ℂ} {t : ℝ} (h1 : 0 < ρ.re) (h2 : ρ.re < 1) (h3 : t < ρ.im)
-    (h4 : ρ.im ≤ t + 1) : ‖ρ - (2 + t * I)‖ ≤ 3 := by
-  refine (Complex.norm_le_abs_re_add_abs_im _).trans ?_
-  have hre : (ρ - (2 + t * I)).re = ρ.re - 2 := by simp
-  have him : (ρ - (2 + t * I)).im = ρ.im - t := by simp
-  rw [hre, him, abs_of_neg (by linarith), abs_of_pos (by linarith)]
-  linarith
-
-
 
 /-- zeros with β ≥ 1/2 in the window (t, t+1], with multiplicity, as a real number. -/
 def NhalfR (t : ℝ) : ℝ := ∑ᶠ ρ ∈ zetaZeroConfig.window t (t + 1) ∩ {ρ | 1/2 ≤ ρ.re}, (zeroMult ρ : ℝ)
@@ -273,9 +260,8 @@ theorem zeta_local_zero_count : ∃ A₀ : ℝ, 1 ≤ A₀ ∧ ∀ t : ℝ,
     rw [← Real.log_exp 1]
     apply Real.log_le_log (Real.exp_pos 1)
     have := Real.exp_one_lt_d9; linarith [abs_nonneg t]
-  have hhalf : (Ncount t (t + 1) : ℝ) ≤ 2 * NhalfR t := by
-    have := zetaZeroConfig.N_le_two_mul_half t (t + 1)
-    simpa [NhalfR, zetaZeroConfig_N] using this
+  have hhalf : (Ncount t (t + 1) : ℝ) ≤ 2 * NhalfR t :=
+    zetaZeroConfig.N_le_two_mul_half t (t + 1)
   rcases le_or_gt 4 |t| with ht | ht
   · calc (Ncount t (t + 1) : ℝ) ≤ 2 * NhalfR t := hhalf
       _ ≤ 2 * (A₁ * Real.log (|t| + 3)) := by

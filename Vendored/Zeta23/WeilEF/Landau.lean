@@ -21,7 +21,6 @@ namespace WeilEF
 
 open Complex Set
 
-
 section UnitDisk
 
 open Metric
@@ -502,7 +501,6 @@ theorem logDeriv_partial_fraction_disk {f : ℂ → ℂ} {s₀ : ℂ} {R B : ℝ
     rw [div_eq_inv_mul, mul_assoc]
     exact mul_le_mul_of_nonneg_left hunit (inv_nonneg.mpr hR.le)
 
-
 end UnitDisk
 
 /-- **Partial fraction for ζ'/ζ at height t** (|t| ≥ 6): there is a finite set Z — exactly the
@@ -655,7 +653,6 @@ theorem zeta_logDeriv_partial_fraction : ∃ C : ℝ, 0 < C ∧ ∀ t : ℝ, 6 �
           mul_le_mul_of_nonneg_left hlogB (by norm_num)
       _ ≤ (44795000 * 50 / 91) * (Real.log 3 + Real.log (C₀ + 2) + A' + 1) * Real.log (|t| + 3) := by
           nlinarith [hT3, hA'0]
-
 
 end WeilEF
 end Zeta23

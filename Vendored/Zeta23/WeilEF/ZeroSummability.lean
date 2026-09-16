@@ -31,10 +31,6 @@ lemma gammaOf_im (ρ : ℂ) : (gammaOf ρ).im = 1 / 2 - ρ.re := by
 lemma abs_im_le_norm_gammaOf (ρ : ℂ) : |ρ.im| ≤ ‖gammaOf ρ‖ := by
   rw [← gammaOf_re]; exact Complex.abs_re_le_norm _
 
-/-- For a point of the open strip, |Im γ_ρ| < 1/2. -/
-lemma abs_gammaOf_im_lt {ρ : ℂ} (h : 0 < ρ.re ∧ ρ.re < 1) : |(gammaOf ρ).im| < 1 / 2 := by
-  rw [gammaOf_im, abs_lt]; constructor <;> linarith [h.1, h.2]
-
 /-- For a point of the closed strip, |Im γ_ρ| ≤ 1/2. -/
 lemma abs_gammaOf_im_le {ρ : ℂ} (h : 0 ≤ ρ.re ∧ ρ.re ≤ 1) : |(gammaOf ρ).im| ≤ 1 / 2 := by
   rw [gammaOf_im, abs_le]; constructor <;> linarith [h.1, h.2]
@@ -228,7 +224,6 @@ theorem EF_zero_sum_summable_gen (Z : ZeroConfig) {A₀ : ℝ} (hA₀ : 1 ≤ A�
         mul_le_mul_of_nonneg_left hkey hm
     _ = C * ((Z.mult (ρ : ℂ) : ℝ) / (1 + Complex.normSq (gammaOf (ρ : ℂ)))) := by
         ring
-
 
 /-! ### The ζ instances -/
 

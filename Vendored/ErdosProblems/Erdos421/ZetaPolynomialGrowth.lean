@@ -1,5 +1,6 @@
 import ErdosProblems.Erdos421.ZetaPolynomialBlocks
-import ErdosProblems.Erdos421.ZetaHeightBound
+import ErdosProblems.Erdos421.ZetaHeightParameters
+import ErdosProblems.Erdos421.ZetaTailScale
 import ErdosProblems.Erdos421.ZetaHeightWeight
 
 /-! # Polynomial-degree growth estimates for the actual zeta function -/

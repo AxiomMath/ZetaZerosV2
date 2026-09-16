@@ -13,10 +13,6 @@ local instance polynomialPrefixCircleHaar :
     Measure.IsAddHaarMeasure (volume : Measure UnitAddCircle) :=
   inferInstanceAs (Measure.IsAddHaarMeasure AddCircle.haarAddCircle)
 
-local instance polynomialPrefixCircleProbability :
-    IsProbabilityMeasure (volume : Measure UnitAddCircle) :=
-  inferInstanceAs (IsProbabilityMeasure AddCircle.haarAddCircle)
-
 noncomputable def polynomialPrefixMoment (k M p : ℕ) (a : UnitAddTorus (Fin k)) : ℝ :=
   ∑ m ∈ Finset.range (M + 1), ‖torusVinogradovWeylSum k m a‖ ^ p
 

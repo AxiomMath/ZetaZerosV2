@@ -1,4 +1,9 @@
-import ErdosProblems.Erdos421.DirichletGram
+import ErdosProblems.Erdos421.MeanSquare
+import Mathlib.MeasureTheory.Integral.IntervalIntegral.DistLEIntegral
+import Mathlib.Analysis.InnerProductSpace.Calculus
+import ErdosProblems.Erdos421.LogarithmicBounds
+import ErdosProblems.Erdos421.HilbertLargeValues
+import Mathlib.Analysis.InnerProductSpace.PiL2
 
 /-! # Finite shifted vectors and their exact correlations -/
 

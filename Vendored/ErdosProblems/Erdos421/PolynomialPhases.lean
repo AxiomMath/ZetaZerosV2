@@ -18,10 +18,6 @@ theorem hasDerivAt_powerPhase {k : ℕ} (b : Fin k → ℝ) (w : ℝ) :
   simpa only [Nat.add_sub_cancel, mul_assoc] using!
     (hasDerivAt_pow ((j : ℕ) + 1) w).const_mul (b j)
 
-theorem powerPhase_sub {k : ℕ} (b c : Fin k → ℝ) (w : ℝ) :
-    powerPhase (b - c) w = powerPhase b w - powerPhase c w := by
-  simp only [powerPhase, Pi.sub_apply, sub_mul, Finset.sum_sub_distrib]
-
 theorem powerPhaseDerivative_sub {k : ℕ} (b c : Fin k → ℝ) (w : ℝ) :
     powerPhaseDerivative (b - c) w = powerPhaseDerivative b w - powerPhaseDerivative c w := by
   simp only [powerPhaseDerivative, Pi.sub_apply, sub_mul, Finset.sum_sub_distrib]

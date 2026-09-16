@@ -40,10 +40,6 @@ theorem meanValue_contraction_mem_Icc {k : ℕ} (hk : 0 < k) :
   · have : (0 : ℝ) ≤ (k : ℝ)⁻¹ := by positivity
     linarith
 
-theorem meanValueDefect_nonneg {k : ℕ} (hk : 0 < k) (r : ℕ) :
-    0 ≤ meanValueDefect k r :=
-  mul_nonneg (Nat.cast_nonneg _) (pow_nonneg (meanValue_contraction_mem_Icc hk).1 r)
-
 theorem meanValueDefect_le_triangle {k : ℕ} (hk : 0 < k) (r : ℕ) :
     meanValueDefect k r ≤ meanValueTriangle k := by
   have hq := meanValue_contraction_mem_Icc hk

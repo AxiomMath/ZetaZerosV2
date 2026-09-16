@@ -726,9 +726,6 @@ lemma ZetaBnd_aux1a {a b : ℝ} (apos : 0 < a) (a_lt_b : a < b) {s : ℂ} (σpos
 lemma Finset.Ioc_eq_Ico (M N : ℕ) : Finset.Ioc N M = Finset.Ico (N + 1) (M + 1) := by
   ext a; simp only [Finset.mem_Ioc, Finset.mem_Ico]; constructor <;> intro ⟨h₁, h₂⟩ <;> omega
 
-lemma Finset.Ioc_eq_Icc (M N : ℕ) : Finset.Ioc N M = Finset.Icc (N + 1) M := by
-  ext a; simp only [Finset.mem_Ioc, Finset.mem_Icc]; constructor <;> intro ⟨h₁, h₂⟩ <;> omega
-
 lemma Finset.Icc_eq_Ico (M N : ℕ) : Finset.Icc N M = Finset.Ico N (M + 1) := by
   ext a; simp only [Finset.mem_Icc, Finset.mem_Ico]; constructor <;> intro ⟨h₁, h₂⟩ <;> omega
 
@@ -849,32 +846,6 @@ lemma ZetaBnd_aux1 (N : ℕ) (Npos : 1 ≤ N) {σ t : ℝ} (hσ : σ ∈ Ioc 0 2
   refine le_trans (by apply norm_add_le) ?_
   simp only [Complex.norm_of_nonneg hσ.1.le, Complex.norm_mul, norm_real, Real.norm_eq_abs, norm_I,
     mul_one]
-  linarith [hσ.2]
-
-lemma ZetaBnd_aux1p (N : ℕ) (Npos : 1 ≤ N) {σ : ℝ} (hσ : σ ∈ Ioc 0 2) :
-    (fun (t : ℝ) ↦
-      ‖(σ + t * I) * ∫ x in Ioi (N : ℝ), (⌊x⌋ + 1 / 2 - x) / (x : ℂ) ^ ((σ + t * I) + 1)‖)
-    =O[Filter.principal {t | 2 ≤ |t|}] fun t ↦ |t| * N ^ (-σ) / σ := by
-  rw [Asymptotics.IsBigO_def]
-  use 2
-  rw [Asymptotics.isBigOWith_principal]
-  intro t ht
-  simp only [mem_ofPred_eq] at ht
-  rw [norm_norm, norm_mul, mul_div_assoc, norm_mul]
-  have : 2 * (‖|t|‖ * ‖↑N ^ (-σ) / σ‖) = (2 * |t|) * ((N : ℝ) ^ (-σ) / σ) := by
-    simp only [Real.norm_eq_abs, _root_.abs_abs, norm_div]
-    have : σ ≠ 0 := by linarith [hσ.1]
-    field_simp
-    rw [abs_of_pos hσ.1]
-    have : 0 < (N : ℝ) ^ (-σ) := by
-      refine Real.rpow_pos_of_pos ?_ _
-      positivity
-    rw [abs_of_pos this]
-    ring
-  rw [this]
-  apply mul_le_mul ?_ (ZetaBnd_aux1b N Npos hσ.1) (norm_nonneg _) (by positivity)
-  refine le_trans (by apply norm_add_le) ?_
-  simp only [norm_real, norm_mul, norm_I, mul_one, Complex.norm_of_nonneg hσ.1.le, Real.norm_eq_abs]
   linarith [hσ.2]
 
 lemma isOpen_aux : IsOpen {z : ℂ | z ≠ 1 ∧ 0 < z.re} := by
@@ -1419,14 +1390,6 @@ lemma norm_complex_log_ofNat (n : ℕ) : ‖(n : ℂ).log‖ = (n : ℝ).log := 
   rw [(by simp : ((n : ℝ) : ℂ) = (n : ℂ))] at this
   rw [← this, Complex.norm_of_nonneg]
   exact Real.log_natCast_nonneg n
-
-lemma Real.log_natCast_monotone : Monotone (fun (n : ℕ) ↦ Real.log n) := by
-  intro n m hnm
-  cases n
-  · simp only [CharP.cast_eq_zero, Real.log_zero, Real.log_natCast_nonneg]
-  · apply Real.log_le_log <;> simp only [Nat.cast_add, Nat.cast_one]
-    · exact Nat.cast_add_one_pos _
-    · exact_mod_cast hnm
 
 lemma Finset.Icc0_eq (N : ℕ) : Finset.Icc 0 N = {0} ∪ Finset.Icc 1 N := by
   refine Finset.ext_iff.mpr ?_
@@ -2081,18 +2044,6 @@ lemma ZetaInvBound1 {σ t : ℝ} (σ_gt : 1 < σ) :
       contrapose! σ_gt; apply le_of_eq; apply And.left; simpa [Complex.ext_iff] using σ_gt
     simpa using riemannZeta_ne_zero_of_one_le_re (by simp [σ_gt.le])
 
-lemma Ioi_union_Iio_mem_cocompact {a : ℝ} (ha : 0 ≤ a) : Ioi (a : ℝ) ∪ Iio (-a : ℝ) ∈ cocompact ℝ := by
-  simp only [Filter.mem_cocompact]
-  use Icc (-a) a
-  constructor
-  · exact isCompact_Icc
-  · rw [@compl_subset_iff_union, ← union_assoc, Icc_union_Ioi_eq_Ici, union_comm, Iio_union_Ici]
-    linarith
-
-lemma lt_abs_mem_cocompact {a : ℝ} (ha : 0 ≤ a) : {t | a < |t|} ∈ cocompact ℝ := by
-  convert Ioi_union_Iio_mem_cocompact ha using 1; ext t
-  simp only [mem_ofPred_eq, mem_union, mem_Ioi, mem_Iio, lt_abs, lt_neg]
-
 lemma ZetaInvBound2 :
     ∃ C > 0, ∀ {σ : ℝ} (_ : σ ∈ Ioc 1 2) (t : ℝ) (_ : 3 < |t|),
     1 / ‖ζ (σ + t * I)‖ ≤ C * (σ - 1) ^ (-(3 : ℝ) / 4) * (Real.log |t|) ^ ((1 : ℝ) / 4) := by
@@ -2540,10 +2491,6 @@ $$
 Then we can bound $1/\log t$ by $C / \log (t + 3)$ for some constant $C>0$.
 \end{proof}
 %-/
-
-lemma ZetaNoZerosOn1Line (t : ℝ) : ζ (1 + t * I) ≠ 0 := by
-  refine riemannZeta_ne_zero_of_one_le_re ?_
-  simp
 
 -- **Begin collaboration with the Alpha Proof team! 5/29/25**
 

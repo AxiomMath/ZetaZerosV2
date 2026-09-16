@@ -34,21 +34,6 @@ theorem meanValueDefect_le_one_of_log {k r : ℕ} (hk : 0 < k)
     _ ≤ (k : ℝ) ^ 2 * ((k : ℝ) ^ 2)⁻¹ := mul_le_mul_of_nonneg_right ht (by positivity)
     _ = 1 := mul_inv_cancel₀ (by positivity)
 
-noncomputable def meanValueIterationIndex (k : ℕ) : ℕ :=
-  ⌈2 * (k : ℝ) * Real.log k⌉₊
-
-theorem meanValueIterationIndex_lower (k : ℕ) :
-    2 * (k : ℝ) * Real.log k ≤ meanValueIterationIndex k := Nat.le_ceil _
-
-theorem meanValueIterationIndex_upper {k : ℕ} (hk : 0 < k) :
-    (meanValueIterationIndex k : ℝ) < 2 * (k : ℝ) * Real.log k + 1 := by
-  have hkR : (1 : ℝ) ≤ k := by exact_mod_cast hk
-  exact Nat.ceil_lt_add_one (mul_nonneg (by positivity) (Real.log_nonneg hkR))
-
-theorem meanValueDefect_iterationIndex_le_one {k : ℕ} (hk : 0 < k) :
-    meanValueDefect k (meanValueIterationIndex k) ≤ 1 :=
-  meanValueDefect_le_one_of_log hk (meanValueIterationIndex_lower k)
-
 theorem vinogradovCount_complete_meanValue_small_defect {k : ℕ} (hk : 2 ≤ k)
     (r N : ℕ) (hr : 2 * (k : ℝ) * Real.log k ≤ r) (hN : 0 < N) :
     (vinogradovCount ((r + 1) * k) k N : ℝ) ≤

@@ -78,7 +78,6 @@ theorem tilted_inversion {k : ℝ → ℂ} (hk : ContDiff ℝ 2 k) (hkc : HasCom
   rw [← h1]
   rfl
 
-
 /-- Step 1 (pointwise on the line): the integrand is the tsum of tilted-transform × L-series
 terms.  −ζ'/ζ = LSeries ↗Λ on Re s > 1 (Mathlib), then distribute paperFT (tilt k b) t. -/
 theorem integrand_eq_tsum {k : ℝ → ℂ} {c : ℝ} (hc1 : 1 < c) (t : ℝ) :
@@ -490,7 +489,6 @@ theorem vertical_line_shift {f : ℂ → ℂ} {a b : ℝ} (hab : a ≤ b)
     simpa using this
   have := tendsto_nhds_unique hlim1 hlim0
   exact sub_eq_zero.mp this
-
 
 /-- paperFT of a continuous compactly supported function is entire (differentiation under the
 integral sign); needed for all contour arguments (H = Hfn k analytic in s). -/

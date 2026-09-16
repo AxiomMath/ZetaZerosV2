@@ -65,18 +65,6 @@ theorem vanDerCorput_uniform_bound (u : ℕ → ℂ) (N : ℕ) {H : ℕ} (hH : 0
       (le_div_iff₀ hHp).mpr (by simpa only [mul_comm] using h)
     _ = _ := by ring
 
-theorem vanDerCorput_uniform_short_bound (u : ℕ → ℂ) {N H : ℕ} (hH : 0 < H) (hHN : H ≤ N)
-    {B : ℝ} (hB : 0 ≤ B) (hu : ∀ n < N, ‖u n‖ ≤ 1)
-    (hcorr : ∀ h, 0 < h → h < H → ‖finiteCorrelation u N h‖ ≤ B) :
-    ‖∑ n ∈ Finset.range N, u n‖ ^ 2 ≤ 2 * (N : ℝ) ^ 2 / H + 2 * N * B := by
-  have hHp : (0 : ℝ) < H := by exact_mod_cast hH
-  have hsize : (N + H : ℝ) ≤ 2 * N := by exact_mod_cast (show N + H ≤ 2 * N by omega)
-  refine (vanDerCorput_uniform_bound u N hH hB hu hcorr).trans ?_
-  calc
-    _ ≤ (2 * (N : ℝ) / H) * (N + H * B) :=
-      mul_le_mul_of_nonneg_right (div_le_div_of_nonneg_right hsize hHp.le) (by positivity)
-    _ = _ := by field_simp
-
 theorem vanDerCorput_uniform_length_bound (u : ℕ → ℂ) {N H M : ℕ}
     (hH : 0 < H) (hNM : N ≤ M) (hHM : H ≤ M) {B : ℝ}
     (hB : 0 ≤ B) (hu : ∀ n < N, ‖u n‖ ≤ 1)

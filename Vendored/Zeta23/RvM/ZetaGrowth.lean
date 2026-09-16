@@ -204,9 +204,6 @@ theorem norm_riemannZeta_ge_of_two_le_re {s : ℂ} (hs : 2 ≤ s.re) :
   simp only [norm_one] at h'
   linarith
 
-lemma two_sub_pi_sq_div_six_pos : 0 < 2 - Real.pi ^ 2 / 6 := by
-  linarith [pi_sq_div_six_sub_one_lt_one]
-
 /-- 1/3 < 2 − π²/6 (π < 3.15 ⇒ π²/6 < 1.654). -/
 lemma one_third_lt_two_sub_pi_sq_div_six : (1 / 3 : ℝ) < 2 - Real.pi ^ 2 / 6 := by
   have := Real.pi_lt_d2
@@ -217,11 +214,6 @@ theorem zeta_lower_bound_two : ∀ t : ℝ, (1 / 3 : ℝ) ≤ ‖riemannZeta (2 
   intro t
   have h := norm_riemannZeta_ge_of_two_le_re (s := 2 + t * I) (by simp)
   linarith [one_third_lt_two_sub_pi_sq_div_six]
-
-/-- ζ does not vanish on Re s ≥ 2 (of course Mathlib has this for Re s ≥ 1:
-`riemannZeta_ne_zero_of_one_le_re`; restated for convenience). -/
-theorem riemannZeta_ne_zero_of_two_le_re {s : ℂ} (hs : 2 ≤ s.re) : riemannZeta s ≠ 0 :=
-  riemannZeta_ne_zero_of_one_le_re (by linarith)
 
 /-- Upper bound on Re s ≥ 2: ‖ζ(s)‖ ≤ π²/6. -/
 theorem norm_riemannZeta_le_of_two_le_re {s : ℂ} (hs : 2 ≤ s.re) :

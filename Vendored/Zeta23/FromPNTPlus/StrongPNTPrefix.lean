@@ -183,17 +183,6 @@ theorem LogOfAnalyticFunction {r R : ℝ} {B : ℂ → ℂ}
   · intro z hz
     exact (hJB.1 z (Metric.closedBall_subset_ball r_lt_R hz)).deriv
 
-theorem LogOfAnalyticFunction' {r' r R : ℝ} {B : ℂ → ℂ}
-    (r'_pos : 0 < r') (r'_lt_r : r' < r) (r_lt_R : r < R)
-    (BanalyticOnNhdOfDR : AnalyticOnNhd ℂ B (Metric.closedBall (0 : ℂ) R))
-    (Bnonzero : ∀ z ∈ Metric.closedBall (0 : ℂ) r, B z ≠ 0) :
-    ∃ (J_B : ℂ → ℂ), (AnalyticOnNhd ℂ J_B (Metric.ball 0 r)) ∧
-      (J_B 0 = 0) ∧
-      (∀ z ∈ Metric.closedBall 0 r', (deriv J_B) z = (deriv B) z / (B z)) ∧
-      (∀ z ∈ Metric.ball 0 r, Real.log ‖B z‖ - Real.log ‖B 0‖ = (J_B z).re) := by
-  have BanalyticOnNhdOfDr : AnalyticOnNhd ℂ B (Metric.closedBall (0 : ℂ) r) := BanalyticOnNhdOfDR.mono (Metric.closedBall_subset_closedBall r_lt_R.le)
-  exact LogOfAnalyticFunction r'_pos r'_lt_r BanalyticOnNhdOfDr Bnonzero
-
 def SetOfZeros (R : ℝ) (f : ℂ → ℂ) : Set ℂ := {ρ : ℂ | ‖ρ‖ ≤ R ∧ f ρ = 0}
 
 lemma finiteSetOfZeros_mono {r : ℝ} {f : ℂ → ℂ}
@@ -355,28 +344,6 @@ lemma BlaschkeOfZero {r R : ℝ} {f : ℂ → ℂ}
   rw[← Finset.prod_inv_distrib, ← Finset.prod_mul_distrib]
   simp only [div_eq_inv_mul, mul_pow, inv_pow]
 
-lemma norm_fOfZero_le_norm_BlaschkeOfZero {r R : ℝ} {f : ℂ → ℂ}
-    (r_pos : 0 < r) (r_lt_R : r < R) (R_lt_one : R < 1)
-    (finiteZeros : (SetOfZeros 1 f).Finite)
-    (hf_neq_zero_at_zero : f 0 ≠ 0) :
-    ‖f 0‖ ≤ ‖BlaschkeB r R f 0‖ := by
-  have r_lt_one : r < 1 := lt_trans r_lt_R R_lt_one
-  rw [BlaschkeOfZero r_pos r_lt_one r_lt_R finiteZeros hf_neq_zero_at_zero, ← mul_one ‖f 0‖]
-  refine mul_le_mul (by rw[mul_one]) ?_ (zero_le_one) (mul_nonneg (norm_nonneg (f 0)) zero_le_one)
-  rw [← Finset.prod_const_one (s := (finiteSetOfZeros_mono r_lt_one finiteZeros).toFinset)]
-  apply Finset.prod_le_prod
-  · intro ρ hρ
-    exact zero_le_one
-  · intro ρ hρ
-    simp only [SetOfZeros, Finite.mem_toFinset, mem_ofPred_eq] at hρ
-    apply one_le_pow₀
-    rw[one_le_div]
-    · linarith
-    · rw [norm_pos_iff]
-      by_contra h
-      rw [h] at hρ
-      exact hf_neq_zero_at_zero hρ.2
-
 lemma DiskBound {B r R : ℝ} {f : ℂ → ℂ} {z : ℂ}
     (r_pos : 0 < r) (r_lt_R : r < R) (R_lt_one : R < 1)
     (finiteZeros : (SetOfZeros 1 f).Finite)
@@ -413,45 +380,6 @@ lemma DiskBound {B r R : ℝ} {f : ℂ → ℂ} {z : ℂ}
       exact norm_ne_zero_iff.mpr (sub_ne_zero.mpr (fun h => hw_not_in (h ▸ hw'_in)))
   rw[Bf_eq_f_at_w]
   exact fz_bound w (le_of_eq hw)
-
-lemma BlaschkeNonzero {r R : ℝ} {f : ℂ → ℂ}
-    (r_pos : 0 < r) (r_lt_R : r < R) (R_lt_one : R < 1)
-    (finiteZeros : (SetOfZeros 1 f).Finite)
-    (hfAnalytic : AnalyticOnNhd ℂ f (Metric.closedBall (0 : ℂ) 1))
-    (hf_neq_zero_at_zero : f 0 ≠ 0) :
-    ∀ z ∈ Metric.closedBall (0 : ℂ) r, BlaschkeB r R f z ≠ 0 := by
-  have r_lt_one : r < 1 := lt_trans r_lt_R R_lt_one
-  have R_pos : 0 < R := lt_trans r_pos r_lt_R
-  intro z hz
-  have hz_norm_le_r : ‖z‖ ≤ r := by rwa [mem_closedBall_iff_norm, sub_zero] at hz
-  have hz_norm_lt_R : ‖z‖ < R := by linarith
-  let hFin := finiteSetOfZeros_mono r_lt_one finiteZeros
-  have hBProd : ∏ ρ ∈ hFin.toFinset,
-      (↑R - z * (starRingEnd ℂ) ρ / ↑R) ^ analyticOrderNatAt f ρ ≠ 0 := by
-    apply Finset.prod_ne_zero_iff.mpr
-    intro ρ hρ
-    apply pow_ne_zero
-    norm_num [ sub_eq_zero, Complex.ext_iff ];
-    simp only [SetOfZeros, Finite.mem_toFinset, mem_ofPred_eq] at hρ
-    rw [ eq_div_iff ] <;> norm_num [ Complex.normSq, Complex.norm_def ] at *;
-    · rw [Real.sqrt_lt' (by linarith)] at hz_norm_lt_R
-      rw [ Real.sqrt_le_iff ] at hρ
-      exact fun h => absurd h ( by nlinarith [ sq_nonneg ( z.re - ρ.re ), sq_nonneg ( z.im - ρ.im ), mul_lt_mul_of_pos_left r_lt_R R_pos ] )
-    · linarith
-  unfold BlaschkeB Cf
-  by_cases z_in_zeros : z ∈ SetOfZeros r f
-  · simp only [hFin, z_in_zeros, ↓reduceDIte]
-    obtain ⟨_, _, hne, heq⟩ :=
-      ZeroFactorization (by linarith) (hfAnalytic.mono (Metric.closedBall_subset_closedBall (by linarith)))
-        hf_neq_zero_at_zero z_in_zeros
-    rw [heq.1]
-    refine mul_ne_zero (div_ne_zero hne (Finset.prod_ne_zero_iff.mpr fun ρ hρ =>
-      pow_ne_zero _ (sub_ne_zero.mpr fun h =>
-        (Finset.mem_sdiff.mp hρ).2 (Finset.mem_singleton.mpr h.symm)))) hBProd
-  · simp only [hFin, z_in_zeros, ↓reduceDIte]
-    refine mul_ne_zero (div_ne_zero (fun hfz => z_in_zeros ⟨hz_norm_le_r, hfz⟩)
-      (Finset.prod_ne_zero_iff.mpr fun ρ hρ =>
-        pow_ne_zero _ (sub_ne_zero.mpr fun h => z_in_zeros (h ▸ hFin.mem_toFinset.mp hρ)))) hBProd
 
 theorem ZerosBound {B r R : ℝ} {f : ℂ → ℂ}
     (r_pos : 0 < r) (r_lt_one : r < 1) (r_lt_R : r < R) (R_lt_one : R < 1)

@@ -168,16 +168,4 @@ theorem phase_mul_finiteWindowLorentzianSum_sub_full_tsum
   have hsplit := fullZeroLorentzianSummand_window_add_compl x hx T t
   linear_combination hsplit
 
-/-- Norm form of the exact full/window comparison. -/
-theorem norm_phase_mul_finiteWindowLorentzianSum_sub_full_tsum
-    (x : ℝ) (hx : 1 ≤ x) (T t : ℝ) :
-    ‖(x : ℂ) ^ (-Complex.I * t) * finiteWindowLorentzianSum x T t -
-        (∑' rho : (Zeta23.zetaZeros Zeta23.zetaSeam).carrier,
-          fullZeroLorentzianSummand x t rho)‖ =
-      ‖∑' rho : {rho : (Zeta23.zetaZeros Zeta23.zetaSeam).carrier //
-          rho ∉ finiteZeroCarrierWindow T},
-        fullZeroLorentzianSummand x t rho‖ := by
-  rw [phase_mul_finiteWindowLorentzianSum_sub_full_tsum x hx]
-  exact norm_neg _
-
 end ZetaZeros.Unconditional.PairCorrelationProof

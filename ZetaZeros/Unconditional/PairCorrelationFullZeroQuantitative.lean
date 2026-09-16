@@ -167,14 +167,6 @@ theorem continuous_fullZeroMomentErrorEnvelope (height : ℝ) (hheight : 0 < hei
       ((Real.continuous_const_rpow hheight.ne').comp continuous_neg))).add
         ((Real.continuous_const_rpow hheight.ne').mul continuous_const)
 
-theorem fullZeroMomentErrorEnvelope_nonneg
-    (height exponent : ℝ) (hheight : Real.exp 1 ≤ height) :
-    0 ≤ fullZeroMomentErrorEnvelope height exponent := by
-  have hheightPos : 0 < height := (Real.exp_pos 1).trans_le hheight
-  have hlog : 1 ≤ Real.log height := (Real.le_log_iff_exp_le hheightPos).2 hheight
-  unfold fullZeroMomentErrorEnvelope
-  positivity
-
 theorem intervalIntegral_fullZeroMomentErrorEnvelope_le
     (height : ℝ) (hheight : Real.exp 1 ≤ height) :
     (∫ exponent in (0 : ℝ)..1, fullZeroMomentErrorEnvelope height exponent) ≤

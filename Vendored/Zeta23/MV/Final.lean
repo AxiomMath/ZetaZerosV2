@@ -23,9 +23,6 @@ namespace MV
 theorem eigenBound_thirteen : EigenBound 13 :=
   fun _ι _ _ _freq _δ h u hu μ heig => eigen_bound h u hu μ heig
 
-/-- **`MVDiag 13`** — the weighted Hilbert inequality, literature (diagonal) form. -/
-theorem mvDiag_thirteen : MVDiag 13 := mvDiag_of_eigenBound eigenBound_thirteen
-
 /-- **H-MV:** `∃ C > 0, MVHilbert C` (the field `PaperInputs.MV`). -/
 theorem mv_hilbert : ∃ C : ℝ, 0 < C ∧ MVHilbert C :=
   mvHilbert_of_eigenBound (by norm_num) eigenBound_thirteen

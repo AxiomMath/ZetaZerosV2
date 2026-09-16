@@ -253,7 +253,7 @@ theorem exists_finiteWindow_exterior_energy_bound_of_re_le :
     intro time htime
     have hsum := finiteWindow_shifted_lorentzian_sum_below hcount hheight htime
       (finiteZeroCarrierWindow height) hpositive hbounded
-    simp only [Zeta23.zetaZeros_mult] at hsum
+    dsimp only [Zeta23.zetaZeros] at hsum
     calc
       ‖finiteWindowLorentzianSum base height time‖ ≤
           (8 / 3 : ℝ) * base ^ exponent *
@@ -272,7 +272,7 @@ theorem exists_finiteWindow_exterior_energy_bound_of_re_le :
     intro time htime
     have hsum := finiteWindow_shifted_lorentzian_sum_above hcount hheight htime
       (finiteZeroCarrierWindow height) hpositive hbounded
-    simp only [Zeta23.zetaZeros_mult] at hsum
+    dsimp only [Zeta23.zetaZeros] at hsum
     calc
       ‖finiteWindowLorentzianSum base height time‖ ≤
           (8 / 3 : ℝ) * base ^ exponent *
@@ -383,34 +383,5 @@ theorem finiteWindowExteriorEnergyBound_of_strip
     _ ≤ constant * (height + base) := by
       apply mul_le_mul_of_nonneg_left _ hconstant.le
       linarith
-
-theorem finiteWindowExteriorEnergyBound_of_boundary_margin
-    (hboundaryMargin :
-      ∃ margin : ℝ → ℝ, ∃ threshold : ℝ, Real.exp 2 ≤ threshold ∧
-        (∀ height ≥ threshold, margin height ≤ 1 / 2) ∧
-        (∀ height ≥ threshold,
-          3 * Real.log (Real.log height) ≤ 2 * margin height * Real.log height) ∧
-        (∀ height ≥ threshold, ∀ zero : ℂ, Zeta23.IsNontrivialZero zero →
-          |zero.im| ≤ height * (Real.log height) ^ 2 →
-            |zero.re - 1 / 2| ≤ 1 / 2 - margin height)) :
-    FiniteWindowExteriorEnergyBound := by
-  obtain ⟨margin, threshold, hthreshold, hmargin, hsaving, hstrip⟩ :=
-    hboundaryMargin
-  refine finiteWindowExteriorEnergyBound_of_strip margin threshold hmargin hsaving ?_
-  intro height hheight zero hzero
-  have hheightExp : Real.exp 2 ≤ height := hthreshold.trans hheight
-  have hheightPos : 0 < height := (Real.exp_pos 2).trans_le hheightExp
-  have hlogTwo : 2 ≤ Real.log height :=
-    (Real.le_log_iff_exp_le hheightPos).mpr hheightExp
-  have hheightCutoff : height ≤ height * (Real.log height) ^ 2 := by
-    have hsquare : 1 ≤ (Real.log height) ^ 2 := by nlinarith
-    exact le_mul_of_one_le_right hheightPos.le hsquare
-  have hzeroWindow := mem_finiteZeroWindow.mp (mem_finiteZeroCarrierWindow.mp hzero)
-  have hzeroHeight : |(zero : ℂ).im| ≤ height * (Real.log height) ^ 2 := by
-    rw [abs_of_pos hzeroWindow.2.1]
-    exact hzeroWindow.2.2.trans hheightCutoff
-  have hrealPart :=
-    (abs_le.mp (hstrip height hheight (zero : ℂ) zero.property hzeroHeight)).2
-  linarith
 
 end ZetaZeros.Unconditional.PairCorrelationProof

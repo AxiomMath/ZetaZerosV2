@@ -33,10 +33,6 @@ theorem intervalIntegral_mul_const_C (c : ℂ) (f : ℝ → ℂ) (a b : ℝ) :
     ∫ x in a..b, f x * c = (∫ x in a..b, f x) * c :=
   intervalIntegral.integral_mul_const c f
 
-theorem intervalIntegral_const_mul_C (c : ℂ) (f : ℝ → ℂ) (a b : ℝ) :
-    ∫ x in a..b, c * f x = c * ∫ x in a..b, f x :=
-  intervalIntegral.integral_const_mul c f
-
 /-! ### Elementary bounds for points in the right half-plane -/
 
 /-- for `x ≥ 0` real and `0 < re w`: `‖x + w‖ ≥ |im w|`. -/
@@ -175,16 +171,9 @@ theorem natp1_re_pos (hw : 0 < w.re) (n : ℕ) : 0 < ((n : ℂ) + 1 + w).re := b
 theorem natp1_ne_zero (hw : 0 < w.re) (n : ℕ) : (n : ℂ) + 1 + w ≠ 0 := fun h => by
   have := natp1_re_pos hw n; rw [h] at this; simp at this
 
-theorem abs_im_le_norm_natp1 (n : ℕ) : |w.im| ≤ ‖(n : ℂ) + 1 + w‖ := by
-  have := Complex.abs_im_le_norm ((n : ℂ) + 1 + w); simpa using this
-
 theorem natp1_le_norm (hw : 0 < w.re) (n : ℕ) : (n : ℝ) + 1 ≤ ‖(n : ℂ) + 1 + w‖ := by
   have h := Complex.re_le_norm ((n : ℂ) + 1 + w)
   simp at h; linarith
-
-/-- cast alignment with the real-parametrized lemmas. -/
-theorem natp1_cast (n : ℕ) : (n : ℂ) + 1 + w = ((((n : ℝ) + 1 : ℝ)) : ℂ) + w := by
-  push_cast; ring
 
 /-- (I1) `1/z_n = [log z_{n+1} − log z_n] + (1/2)/z_n² − ε_{n+1}`. -/
 theorem inv_natp1_eq (hw : 0 < w.re) (n : ℕ) :

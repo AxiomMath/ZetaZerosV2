@@ -8,13 +8,6 @@ noncomputable def logarithmicPowerSaving (M R K : ℕ) : ℝ :=
   (2 * logarithmicDifferenceConstant R / (M : ℝ) ^ ((K : ℝ)⁻¹)) ^
     (((2 ^ R : ℕ) : ℝ)⁻¹)
 
-theorem logarithmicPowerSaving_pos {M : ℕ} (hM : 0 < M) (R K : ℕ) :
-    0 < logarithmicPowerSaving M R K := by
-  unfold logarithmicPowerSaving
-  exact Real.rpow_pos_of_pos
-    (div_pos (mul_pos (by norm_num) (logarithmicDifferenceConstant_pos R))
-      (Real.rpow_pos_of_pos (by exact_mod_cast hM) _)) _
-
 /-- Uniform norm control for every initial subinterval of a dyadic block. -/
 theorem logarithmicSum_uniform_norm_bound {M N : ℕ} (hM : 0 < M) (hN : N ≤ M)
     (R K : ℕ) (hK : 2 * R + 4 ≤ K) {τ : ℝ}

@@ -44,36 +44,10 @@ import Mathlib.Analysis.Asymptotics.Lemmas
 import Mathlib.Algebra.Group.Submonoid.BigOperators
 import Zeta23.FromPNTPlus.EulerMaclaurin
 
-
-
 namespace Mertens
-
 
 open Real Finset Filter Asymptotics
 open ArithmeticFunction hiding log
-
-lemma sum_Ioc_one_eq_sum_Ioc_zero {f : ℕ → ℝ} {x : ℕ} (hx : 1 ≤ x) (hf : f 1 = 0) :
-    ∑ n ∈ Ioc 1 x, f n = ∑ n ∈ Ioc 0 x, f n := by
-  rw [(by rfl : Ioc 0 x = Icc 1 x), ← add_sum_Ioc_eq_sum_Icc hx]
-  simpa
-
-/-- For any `x ≥ 1`, `∑ n ≤ x, log n = x log x - ({x} - 1/2) log x - x + 1 + ∫ t in 1..x, ({t} - 1/2)/t`. -/
-theorem sum_log_eq {x : ℝ} (hx : 1 ≤ x) :
-    ∑ n ∈ Ioc 0 ⌊ x ⌋₊, log n =
-      x * log x - (x - ⌊x⌋₊ - 1 / 2) * log x - x + 1 + ∫ t in 1..x, (t - ⌊t⌋₊ - 1 / 2) / t := by
-  rw [← sum_Ioc_one_eq_sum_Ioc_zero (Nat.le_floor (by grind)) (by simp)]
-  have : 1 = ⌊(1 : ℝ)⌋₊ := by simp
-  nth_rw 1 [this]
-  rw [sum_eq_integral_add_integral_deriv (by norm_num) hx (fun _ _ ↦ (by fun_prop (disch := grind)))]
-  · simp only [log_one, B1, Nat.floor_one, Nat.cast_one, sub_self, zero_sub,
-    RCLike.ofReal_real_eq_id, id_eq, mul_neg, zero_mul, neg_zero, integral_log, mul_zero, sub_zero,
-    deriv_log']
-    ring_nf
-    congr
-    ext
-    ring
-  · simp only [deriv_log', Set.uIcc_of_le hx]
-    fun_prop (disch := grind)
 
 /-- For any `x ≥ 1`, `∑ n ≤ x, log n ≤ x log x`. -/
 theorem sum_log_le {x : ℝ} (hx : 1 ≤ x) :
@@ -88,7 +62,6 @@ theorem sum_log_le {x : ℝ} (hx : 1 ≤ x) :
     gcongr
     · exact log_nonneg hx
     · exact Nat.floor_le (by linarith)
-
 
 lemma integral_log_le {a b : ℝ} (ha : 1 ≤ a) (hab : a ≤ b) :
     ∫ t in a..b, log t ≤ log b * (b - a) := by
@@ -130,15 +103,6 @@ theorem sum_log_ge {x : ℝ} (hx : 1 ≤ x) :
   _ ≥ x * log x - x - log x := by simp
   _ ≥ _ := by linarith [log_le_self (by linarith : 0 ≤ x)]
 
-/-- For any `x`, `∑ n ≤ x, log n = log ⌊x⌋!`. -/
-theorem sum_log_eq_log_factorial (x : ℝ) :
-    ∑ n ∈ Ioc 0 ⌊ x ⌋₊, log n = log (Nat.floor x).factorial := by
-    rw [←prod_Ico_id_eq_factorial, ←log_prod, prod_natCast]
-    · congr
-    intro x hx
-    simp at hx ⊢; grind
-
-
 /-- For any `x`, `∑ n ≤ x, log n = ∑ d ≤ x, Λ(d) ⌊x/d⌋`. -/
 theorem sum_log_eq_sum_mangoldt {x : ℝ} :
     ∑ n ∈ Ioc 0 ⌊x⌋₊, log n = ∑ d ∈ Ioc 0 ⌊x⌋₊, Λ d * ⌊x / d⌋₊ := by
@@ -147,9 +111,6 @@ theorem sum_log_eq_sum_mangoldt {x : ℝ} :
 
 /-- The remainder term in Mertens' first theorem (von Mangoldt form): `E₁Λ x = ∑ d ≤ x, Λ(d)/d - log x`. -/
 noncomputable abbrev E₁Λ (x : ℝ) : ℝ := ∑ d ∈ Ioc 0 ⌊ x ⌋₊, (Λ d) / d - log x
-
-theorem sum_mangoldt_div_eq (x : ℝ) : ∑ d ∈ Ioc 0 ⌊ x ⌋₊, (Λ d) / d = log x + E₁Λ x := by
-    grind
 
 /-- For any `x ≥ 1`, `E₁Λ x ≥ -2`. -/
 theorem E₁Λ.ge {x : ℝ} (hx : 1 ≤ x) :
@@ -167,7 +128,6 @@ theorem E₁Λ.ge {x : ℝ} (hx : 1 ≤ x) :
   _ ≥ x * log x - 2 * x :=
     sum_log_eq_sum_mangoldt ▸ sum_log_ge hx
   _ = _ := by ring
-
 
 /-- For any `x ≥ 1`, `E₁Λ x ≤ log 4 + 4`. -/
 theorem E₁Λ.le {x : ℝ} (hx : 1 ≤ x) :
@@ -195,8 +155,5 @@ theorem E₁Λ.le {x : ℝ} (hx : 1 ≤ x) :
 theorem sum_mangoldt_div_eq_log {x : ℝ} (hx : 1 ≤ x) :
     |∑ d ∈ Ioc 0 ⌊ x ⌋₊, (Λ d) / d - log x| ≤ log 4 + 4 := by
   grind [E₁Λ.le hx, E₁Λ.ge hx, log_nonneg]
-
-theorem E₁Λ.bounded' : ∃ c > 0, ∀ x ≥ 1, |E₁Λ x| ≤ c := by
-  exact ⟨log 4 + 4, (by positivity), fun x hx ↦ sum_mangoldt_div_eq_log hx⟩
 
 end Mertens
