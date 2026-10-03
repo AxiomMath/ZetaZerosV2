@@ -11,9 +11,19 @@ public import ZetaZeros.Zeta.OrderConj
 /-!
 # Transfer of the Hilbert-space inequalities to zeta zeros
 
-This file proves conjugation invariance of the rescaled zero multiset, identifies its finite kernel
-sum with the canonical sum over zeros, and transfers the two abstract finite-set inequalities to
-the three zero-counting functions.
+The rescaled zero multiset is invariant under conjugation, and its finite kernel sum equals
+`unweightedKernelSum eta T`. The finite-set inequalities then give lower bounds for the number of
+simple zeros on the critical line and for the number of distinct zeros.
+
+## Main results
+
+* `rescaledZeros_isConjInvariant`: the rescaled zeros form a conjugation-invariant multiset.
+* `rescaled_kernel_sum_eq_unweightedKernelSum`: the kernel sum over the rescaled zeros is
+  `unweightedKernelSum eta T`.
+* `simpleOnLineCount_lower`: `simpleOnLineCount T` is at least
+  `2 zeroCount T - Re (unweightedKernelSum eta T)`.
+* `distinctZeroCount_lower`: `distinctZeroCount T` is at least
+  `3/2 zeroCount T - Re (unweightedKernelSum eta T) / 2`.
 -/
 
 @[expose] public section
@@ -61,6 +71,8 @@ private lemma rescale_reflected (T : ℝ) (ρ : ℂ) :
     Complex.conj_I, Complex.conj_ofReal]
   ring
 
+/-- For `T > 1`, the rescaled zeros with their multiplicities form a conjugation-invariant
+multiset: every multiplicity is positive, and `z` and `conj z` occur with the same multiplicity. -/
 theorem rescaledZeros_isConjInvariant {T : ℝ} (hT : 1 < T) :
     IsConjInvariant (rescaledZerosFinset T) (rescaledMult T) := by
   refine ⟨?_, ?_, ?_⟩
@@ -92,6 +104,8 @@ private lemma unweightedKernelSum_eq_finset (eta : ℝ → ℝ) (T : ℝ) :
   intro ρ hρ
   rw [finsum_mem_eq_finite_toFinset_sum _ (nontrivialZeros_finite T)]
 
+/-- For `T > 1`, the double sum of `m z m s K(z - s)²` over the rescaled zeros equals
+`unweightedKernelSum eta T`. -/
 theorem rescaled_kernel_sum_eq_unweightedKernelSum {lam : ℝ} {eta : ℝ → ℝ} {T : ℝ}
     (hT : 1 < T) (_hη : IsAdmissible lam eta) :
     (∑ z ∈ rescaledZerosFinset T, ∑ s ∈ rescaledZerosFinset T,

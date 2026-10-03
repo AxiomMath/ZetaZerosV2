@@ -8,15 +8,11 @@ module
 public import ZetaZeros.Hilbert.SymmetryL2
 
 /-!
-# The `L²` inner product of symmetric elements is real
+# Reflection on the symmetric interval
 
-`inner_symmetric_im_eq_zero` says this for *functions*; Gram–Schmidt runs on `L²`, so the same fact
-is needed for the inner product of `Lp` elements. The upgrade needs genuine measure-preservation of
-`u ↦ -u` on the restricted measure — not merely an a.e. transport — because a change of variables
-inside an integral is involved rather than a null-set argument.
-
-With this, "the Gram–Schmidt coefficients are real" becomes a fact about the ambient space, which is
-what lets the process stay inside `symmetricSubspace`.
+Negation `u ↦ -u` preserves Lebesgue measure restricted to `Ioo (-lam) lam`, so an integral over
+the interval is invariant under reflection (`integral_comp_neg_Ioo`). This change of variables is
+what makes the `L²` inner product of two symmetric elements real.
 -/
 
 @[expose] public section
@@ -28,7 +24,7 @@ open MeasureTheory
 variable {lam : ℝ}
 
 /-- Negation preserves Lebesgue measure restricted to the symmetric interval. -/
-theorem measurePreserving_neg_Ioo (lam : ℝ) :
+private theorem measurePreserving_neg_Ioo (lam : ℝ) :
     MeasurePreserving (fun u : ℝ => -u) (volume.restrict (Set.Ioo (-lam) lam))
       (volume.restrict (Set.Ioo (-lam) lam)) := by
   have hpre : (fun u : ℝ => -u) ⁻¹' Set.Ioo (-lam) lam = Set.Ioo (-lam) lam := by

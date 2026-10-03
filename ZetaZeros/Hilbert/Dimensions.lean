@@ -12,10 +12,7 @@ public import ZetaZeros.Hilbert.Basis
 # The dimension gap between the first two subspaces
 
 `dim V - dim U ≤ |R₁|`: passing from `U` to `V` adds only the twisted functions at the simple real
-points, one per point, so the dimension can grow by at most their number.
-
-This is the bound that turns the source's second-range estimate into a statement about the count of
-simple real elements — the quantity the whole proposition is about.
+points, one per point, so the dimension grows by at most their number.
 -/
 
 @[expose] public section
@@ -26,9 +23,8 @@ open Module
 
 variable {lam : ℝ} {eta : ℝ → ℝ}
 
-/-- `finrank (p ⊔ q) ≤ finrank p + finrank q` for finitely-generated submodules of an arbitrary
-module. Mathlib's `finrank_sup_add_finrank_inf_eq` needs the *ambient* module finite-dimensional,
-which `L²` is not, so the bound is built here from the surjection `p × q → p ⊔ q`. -/
+/-- `finrank (p ⊔ q) ≤ finrank p + finrank q` for finitely-generated submodules of an arbitrary,
+not necessarily finite-dimensional, module. -/
 theorem finrank_sup_le {M : Type*} [AddCommGroup M] [Module ℂ M] (p q : Submodule ℂ M)
     [FiniteDimensional ℂ p] [FiniteDimensional ℂ q] :
     finrank ℂ (p ⊔ q : Submodule ℂ M) ≤ finrank ℂ p + finrank ℂ q := by

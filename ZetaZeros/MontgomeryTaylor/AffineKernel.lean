@@ -8,12 +8,16 @@ module
 public import ZetaZeros.Zeta.Basic
 
 /-!
-# The auxiliary kernel `G`, and why it is constant
+# The auxiliary kernel `G` is constant
 
 `G u = f_0 u + integral over [-1/2, 1/2] of |u - v| f_0 v`.
 
-The heart of the computation: the modulus kernel differentiates twice to `2 f_0 u` while
-`f_0'' = -2 f_0`, so `G'' = 0` and `G` is affine; being even, it is constant.
+The modulus kernel differentiates twice to `2 f_0 u` while `f_0'' = -2 f_0`, so `G'' = 0` on
+`[-1/2, 1/2]` and `G` is affine there; being even, it is constant.
+
+## Main results
+
+* `extremalG_const`: `G u = G 0` for `|u| ≤ 1/2`.
 -/
 
 @[expose] public section
@@ -31,7 +35,7 @@ noncomputable def extremalG (u : ℝ) : ℝ :=
 ## Antiderivatives for the modulus kernel
 -/
 
-/-- Antiderivative fact: `d/dv [v sin(√2 v)/√2 + cos(√2 v)/2] = v cos(√2 v)`. -/
+/-- `d/dv [v sin(√2 v)/√2 + cos(√2 v)/2] = v cos(√2 v)`. -/
 lemma hasDerivAt_vcos (v : ℝ) :
     HasDerivAt
       (fun v => v * Real.sin (Real.sqrt 2 * v) / Real.sqrt 2 + Real.cos (Real.sqrt 2 * v) / 2)
@@ -39,7 +43,6 @@ lemma hasDerivAt_vcos (v : ℝ) :
   have h2 : (0:ℝ) < Real.sqrt 2 := Real.sqrt_pos.mpr (by norm_num)
   have h2ne : Real.sqrt 2 ≠ 0 := ne_of_gt h2
   have hmul : Real.sqrt 2 * Real.sqrt 2 = 2 := Real.mul_self_sqrt (by norm_num)
-  -- derivative of sin(√2 v)
   have hlin : HasDerivAt (fun v => Real.sqrt 2 * v) (Real.sqrt 2) v := by
     simpa using (hasDerivAt_id v).const_mul (Real.sqrt 2)
   have hsin : HasDerivAt (fun v => Real.sin (Real.sqrt 2 * v))
@@ -55,7 +58,6 @@ lemma hasDerivAt_vcos (v : ℝ) :
     rw [show -Real.sin (Real.sqrt 2 * v) * Real.sqrt 2
       = -(Real.sqrt 2 * Real.sin (Real.sqrt 2 * v)) by ring] at this
     exact this
-  -- g1 = v * sin(√2 v) / √2
   have hg1 : HasDerivAt (fun v => v * Real.sin (Real.sqrt 2 * v) / Real.sqrt 2)
       ((Real.sin (Real.sqrt 2 * v) + v * (Real.sqrt 2 * Real.cos (Real.sqrt 2 * v))) / Real.sqrt 2)
       v := by
@@ -80,9 +82,9 @@ lemma hasDerivAt_vcos (v : ℝ) :
   rw [hfun, ← hval]
   exact hsum
 
-/-- Antiderivative for the shifted kernel: for fixed `u`,
+/-- For fixed `u`,
     `d/dv [u·sin(√2 v)/√2 − (v·sin(√2 v)/√2 + cos(√2 v)/2)] = (u − v)·cos(√2 v)`. -/
-lemma hasDerivAt_shift (u v : ℝ) :
+private lemma hasDerivAt_shift (u v : ℝ) :
     HasDerivAt (fun v => u * Real.sin (Real.sqrt 2 * v) / Real.sqrt 2
         - (v * Real.sin (Real.sqrt 2 * v) / Real.sqrt 2 + Real.cos (Real.sqrt 2 * v) / 2))
       ((u - v) * Real.cos (Real.sqrt 2 * v)) v := by
@@ -97,7 +99,6 @@ lemma hasDerivAt_shift (u v : ℝ) :
     simp only [Function.comp_def] at this
     rw [mul_comm] at this
     exact this
-  -- derivative of u * sin(√2 v)/√2 is u cos(√2 v)
   have hA1 : HasDerivAt (fun v => u * Real.sin (Real.sqrt 2 * v) / Real.sqrt 2)
       (u * Real.cos (Real.sqrt 2 * v)) v := by
     have hd := (hsin.const_mul u).div_const (Real.sqrt 2)
@@ -118,8 +119,8 @@ lemma hasDerivAt_shift (u v : ℝ) :
   rw [hfun, ← hval2]
   exact hsub
 
+/-- `G` is constant on `[-1/2, 1/2]`. -/
 lemma extremalG_const {u : ℝ} (hu : |u| ≤ 1 / 2) : extremalG u = extremalG 0 := by
-  -- Direct evaluation: for |u| ≤ 1/2, extremalG u = c·(sin(1/√2)/√2 + cos(1/√2)), independent of u.
   suffices h : ∀ w : ℝ, |w| ≤ 1/2 → extremalG w
       = (Real.sqrt 2 * Real.sin (1 / Real.sqrt 2))⁻¹
         * (Real.sin (1 / Real.sqrt 2) / Real.sqrt 2 + Real.cos (1 / Real.sqrt 2)) by
@@ -133,9 +134,7 @@ lemma extremalG_const {u : ℝ} (hu : |u| ≤ 1 / 2) : extremalG u = extremalG 0
   have hwabs : -(1:ℝ)/2 ≤ w ∧ w ≤ 1/2 := by
     rw [abs_le] at hw; constructor <;> linarith [hw.1, hw.2]
   unfold extremalG
-  -- extremalTest w = c cos(√2 w)
   rw [extremalTest, ite_eq_left hw]
-  -- replace extremalTest v by c cos(√2 v) in the kernel
   have hcongr : (∫ v in (-(1:ℝ)/2)..(1/2), |w - v| * extremalTest v)
       = ∫ v in (-(1:ℝ)/2)..(1/2),
           |w - v| * (Real.cos (Real.sqrt 2 * v) / (Real.sqrt 2 * Real.sin (1 / Real.sqrt 2))) := by
@@ -146,10 +145,8 @@ lemma extremalG_const {u : ℝ} (hu : |u| ≤ 1 / 2) : extremalG u = extremalG 0
     simp only
     rw [extremalTest, ite_eq_left hvabs]
   rw [hcongr]
-  -- pull constant c out
   set c : ℝ := (Real.sqrt 2 * Real.sin (1 / Real.sqrt 2))⁻¹ with hc
   have hcne : Real.sqrt 2 * Real.sin (1 / Real.sqrt 2) ≠ 0 := by
-    -- shown nonzero from positivity below; here just need it for field_simp
     have hsqrt2_lt : Real.sqrt 2 < 2 := by
       have h := Real.sqrt_lt_sqrt (by norm_num : (0:ℝ) ≤ 2) (by norm_num : (2:ℝ) < 4)
       rwa [show (4:ℝ) = 2^2 by norm_num, Real.sqrt_sq (by norm_num : (0:ℝ) ≤ 2)] at h
@@ -172,8 +169,6 @@ lemma extremalG_const {u : ℝ} (hu : |u| ≤ 1 / 2) : extremalG u = extremalG 0
     simp only [hc]
     field_simp
   rw [hrw]
-  -- compute the kernel integral K := ∫ |w-v| cos(√2 v)
-  -- = -cos(√2 w) + sin(1/√2)/√2 + cos(1/√2)
   have hcontK : Continuous (fun v : ℝ => |w - v| * Real.cos (Real.sqrt 2 * v)) := by
     exact ((continuous_const.sub continuous_id').abs).mul (by continuity)
   have hcontvcos : Continuous (fun v : ℝ => (w - v) * Real.cos (Real.sqrt 2 * v)) := by
@@ -181,11 +176,9 @@ lemma extremalG_const {u : ℝ} (hu : |u| ≤ 1 / 2) : extremalG u = extremalG 0
   have hK : (∫ v in (-(1:ℝ)/2)..(1/2), |w - v| * Real.cos (Real.sqrt 2 * v))
       = -Real.cos (Real.sqrt 2 * w)
         + Real.sin (1 / Real.sqrt 2) / Real.sqrt 2 + Real.cos (1 / Real.sqrt 2) := by
-    -- split at w
     rw [← intervalIntegral.integral_add_adjacent_intervals
       (a := -(1:ℝ)/2) (b := w) (c := 1/2)
       (hcontK.intervalIntegrable _ _) (hcontK.intervalIntegrable _ _)]
-    -- on [-1/2,w], w - v ≥ 0 so |w-v| = w - v
     have hleft : (∫ v in (-(1:ℝ)/2)..w, |w - v| * Real.cos (Real.sqrt 2 * v))
         = ∫ v in (-(1:ℝ)/2)..w, (w - v) * Real.cos (Real.sqrt 2 * v) := by
       apply intervalIntegral.integral_congr
@@ -193,7 +186,6 @@ lemma extremalG_const {u : ℝ} (hu : |u| ≤ 1 / 2) : extremalG u = extremalG 0
       rw [Set.uIcc_of_le hwabs.1, Set.mem_Icc] at hv
       simp only
       rw [abs_of_nonneg (show (0:ℝ) ≤ w - v by linarith [hv.2])]
-    -- on [w,1/2], w - v ≤ 0 so |w-v| = -(w-v) = v - w
     have hright : (∫ v in w..(1/2), |w - v| * Real.cos (Real.sqrt 2 * v))
         = ∫ v in w..(1/2), (-(w - v)) * Real.cos (Real.sqrt 2 * v) := by
       apply intervalIntegral.integral_congr
@@ -202,17 +194,14 @@ lemma extremalG_const {u : ℝ} (hu : |u| ≤ 1 / 2) : extremalG u = extremalG 0
       simp only
       rw [abs_of_nonpos (show w - v ≤ 0 by linarith [hv.1])]
     rw [hleft, hright]
-    -- antiderivative A v = w sin(√2 v)/√2 - (v sin(√2 v)/√2 + cos(√2 v)/2)
     set A : ℝ → ℝ := fun v => w * Real.sin (Real.sqrt 2 * v) / Real.sqrt 2
         - (v * Real.sin (Real.sqrt 2 * v) / Real.sqrt 2 + Real.cos (Real.sqrt 2 * v) / 2) with hA
     have hAderiv : ∀ x : ℝ, HasDerivAt A ((w - x) * Real.cos (Real.sqrt 2 * x)) x :=
       fun x => hasDerivAt_shift w x
-    -- left integral = A w - A (-1/2)
     have hleftval : (∫ v in (-(1:ℝ)/2)..w, (w - v) * Real.cos (Real.sqrt 2 * v))
         = A w - A (-(1:ℝ)/2) := by
       rw [intervalIntegral.integral_eq_sub_of_hasDerivAt (fun x _ => hAderiv x)
         (hcontvcos.intervalIntegrable _ _)]
-    -- right integral of -(w-v)cos = A w - A(1/2)
     have hrightval : (∫ v in w..(1/2), (-(w - v)) * Real.cos (Real.sqrt 2 * v))
         = A w - A (1/2) := by
       have hneg : (∫ v in w..(1/2), (-(w - v)) * Real.cos (Real.sqrt 2 * v))
@@ -224,15 +213,12 @@ lemma extremalG_const {u : ℝ} (hu : |u| ≤ 1 / 2) : extremalG u = extremalG 0
         (hcontvcos.intervalIntegrable _ _)]
       ring
     rw [hleftval, hrightval]
-    -- A w = -cos(√2 w)/2
     have hAw : A w = -Real.cos (Real.sqrt 2 * w) / 2 := by
       simp only [hA]; ring
-    -- A(1/2) : √2*(1/2) = 1/√2
     have hAhalf : A (1/2) = w * Real.sin (1 / Real.sqrt 2) / Real.sqrt 2
         - ((1/2) * Real.sin (1 / Real.sqrt 2) / Real.sqrt 2 + Real.cos (1 / Real.sqrt 2) / 2) := by
       simp only [hA]
       rw [hkey]
-    -- A(-1/2) : √2*(-1/2) = -(1/√2)
     have hAmhalf : A (-(1:ℝ)/2) = -(w * Real.sin (1 / Real.sqrt 2)) / Real.sqrt 2
         - (-(1:ℝ)/2 * -Real.sin (1 / Real.sqrt 2) / Real.sqrt 2
             + Real.cos (1 / Real.sqrt 2) / 2) := by

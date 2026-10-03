@@ -10,17 +10,27 @@ public import ZetaZeros.Hilbert.Propositions
 public import ZetaZeros.Zeta.TransferCounts
 
 /-!
-# The finite-set bounds transferred to the zeros
+# Lower bounds for the simple-plus-on-line and simple-or-on-line counts
 
-Each mirrors `simpleOnLineCount_lower`: apply the proposition to the rescaled zeros, then rewrite
-the three pieces -- the total mass, the kernel sum, and the count -- into their zeta-side names.
+The finite-set inequalities `card_simplePart_add_realMass_lower` and `simpleOrRealMass_lower`,
+applied to the rescaled zeros up to height `T`, give lower bounds for
+`simpleZeroCount T + onLineCount T` and for `simpleOrOnLineCount T` in terms of `zeroCount T` and
+the kernel sum `unweightedKernelSum eta T`.
+
+## Main results
+
+* `simpleZeroCount_add_onLineCount_lower`: the lower bound for
+  `simpleZeroCount T + onLineCount T`.
+* `simpleOrOnLineCount_lower`: the lower bound for `simpleOrOnLineCount T`.
 -/
 
 @[expose] public section
 
 namespace ZetaZeros
 
-/-- **(2.5) transferred** (`lem_N_simple_plus_on_line_lower`). -/
+/-- **Lower bound for the simple-plus-on-line count.** For an admissible `eta` and `T > 1` with a
+zero up to height `T`, `3 N(T) - Re (unweightedKernelSum eta T)` is at most the number of simple
+zeros plus the number of zeros on the critical line counted with multiplicity. -/
 @[zz_tag "lem_N_simple_plus_on_line_lower"]
 theorem simpleZeroCount_add_onLineCount_lower {lam T : ℝ} {eta : ℝ → ℝ}
     (hT : 1 < T) (hzeros : (nontrivialZeros T).Nonempty) (hη : IsAdmissible lam eta) :
@@ -45,8 +55,10 @@ theorem simpleZeroCount_add_onLineCount_lower {lam T : ℝ} {eta : ℝ → ℝ}
     exact_mod_cast sum_allRealPart_rescaled_eq_onLineCount hT
   rwa [hsum, hkernel, hcard, hmass] at hbound
 
-/-- **(2.6) transferred** (`lem_N_simple_or_on_line_lower`). Carries the side condition
-`1 ≤ A < 2` and the second-moment bound through. -/
+/-- **Lower bound for the simple-or-on-line count.** For an admissible `eta`, `T > 1` with a zero
+up to height `T`, and `1 ≤ A < 2` with `Re (unweightedKernelSum eta T) ≤ A N(T)`, the zeros that
+are simple or on the critical line, counted with multiplicity, number at least
+`(5 + 2√2 - 2A) / (3 + 2√2) N(T)`. -/
 @[zz_tag "lem_N_simple_or_on_line_lower"]
 theorem simpleOrOnLineCount_lower {lam T Ac : ℝ} {eta : ℝ → ℝ}
     (hT : 1 < T) (hzeros : (nontrivialZeros T).Nonempty) (hη : IsAdmissible lam eta)

@@ -12,17 +12,15 @@ public import ZetaZeros.Zeta.Finite
 /-!
 # The twisted functions live in `L²((-lam, lam))`
 
-Infrastructure the `L²` design needs: the twisted functions and their even and odd parts are
-square-integrable on the interval, so they are genuine elements of the ambient Hilbert space and
-`Submodule.span` may be taken of them.
+The twisted functions and their even and odd parts are square-integrable on the interval, so they
+are elements of the ambient Hilbert space and `Submodule.span` may be taken of them.
 
 The bound is the only analytic content. `‖fz eta z u‖ = |eta u| · exp(2π u · im z)`, and on a
 bounded interval the exponential is bounded by `exp(2π · lam · |im z|)`, so `fz` is dominated by a
-constant multiple of `eta`, which is square-integrable by admissibility. Note the twist is *not*
-bounded by `1` unless `z` is real — that is exactly why the interval has to be bounded.
+constant multiple of `eta`, which is square-integrable by admissibility. The twist is not bounded
+by `1` unless `z` is real, so the boundedness of the interval is used.
 
-Also here: the passage from the rescaled zeros as a `Set` to the `Finset` that
-`IsConjInvariant` requires.
+The module also defines `rescaledZerosFinset`, the rescaled zeros as a `Finset`.
 -/
 
 @[expose] public section
@@ -101,16 +99,15 @@ theorem memLp_hz (h : IsAdmissible lam eta) (z : ℂ) :
   rw [hh]
   exact ((memLp_fz h z).sub (memLp_fz h ((starRingEnd ℂ) z))).const_smul _
 
-/-! ## From the rescaled zeros as a set to the finite set the propositions need -/
+/-! ## The rescaled zeros as a finite set -/
 
-/-- The rescaled zeros as a `Finset`, which is what `IsConjInvariant` and the key
-proposition take. The source's `def_Z_T` produces a `Set`; finiteness of the zero set is what
-bridges them. -/
+/-- The rescaled zeros as a `Finset`: the image under `rescale T` of the finite set
+`nontrivialZeros T`. Its underlying set is `rescaledZeros T`. -/
 noncomputable def rescaledZerosFinset (T : ℝ) : Finset ℂ :=
   (nontrivialZeros_finite T).toFinset.image (rescale T)
 
 @[simp]
-theorem coe_rescaledZerosFinset (T : ℝ) :
+private theorem coe_rescaledZerosFinset (T : ℝ) :
     ((rescaledZerosFinset T : Finset ℂ) : Set ℂ) = rescaledZeros T := by
   simp [rescaledZerosFinset, rescaledZeros, Set.Finite.coe_toFinset]
 

@@ -25,7 +25,6 @@ lemma extremalG_zero : extremalG 0 = montgomeryTaylorConst := by
   have h2 : (0:ℝ) < Real.sqrt 2 := Real.sqrt_pos.mpr (by norm_num)
   have h2ne : Real.sqrt 2 ≠ 0 := ne_of_gt h2
   have hmul : Real.sqrt 2 * Real.sqrt 2 = 2 := Real.mul_self_sqrt (by norm_num)
-  -- sin(1/√2) positivity
   have hsqrt2_lt : Real.sqrt 2 < 2 := by
     have h := Real.sqrt_lt_sqrt (by norm_num : (0:ℝ) ≤ 2) (by norm_num : (2:ℝ) < 4)
     rwa [show (4:ℝ) = 2^2 by norm_num, Real.sqrt_sq (by norm_num : (0:ℝ) ≤ 2)] at h
@@ -39,17 +38,13 @@ lemma extremalG_zero : extremalG 0 = montgomeryTaylorConst := by
   have hsin_pos : 0 < Real.sin (1 / Real.sqrt 2) :=
     Real.sin_pos_of_pos_of_lt_pi hinv_pos hinv_lt_pi
   have hsin_ne : Real.sin (1 / Real.sqrt 2) ≠ 0 := ne_of_gt hsin_pos
-  -- key: √2 * (1/2) = 1/√2
   have hkey : Real.sqrt 2 * (1/2) = 1 / Real.sqrt 2 := by
     rw [eq_div_iff h2ne]; nlinarith [hmul]
-  -- abbreviation for the antiderivative
   set F : ℝ → ℝ :=
     fun v => v * Real.sin (Real.sqrt 2 * v) / Real.sqrt 2 + Real.cos (Real.sqrt 2 * v) / 2 with hF
-  -- integrability of v cos(√2 v)
   have hcont : Continuous (fun v => v * Real.cos (Real.sqrt 2 * v)) := by
     continuity
   unfold extremalG
-  -- the kernel integral: replace extremalTest v by cos(√2 v)/(√2 sin(1/√2)) on the interval
   have hcongr : (∫ v in (-(1:ℝ)/2)..(1/2), |0 - v| * extremalTest v)
       = ∫ v in (-(1:ℝ)/2)..(1/2),
           |v| * (Real.cos (Real.sqrt 2 * v) / (Real.sqrt 2 * Real.sin (1 / Real.sqrt 2))) := by
@@ -60,7 +55,6 @@ lemma extremalG_zero : extremalG 0 = montgomeryTaylorConst := by
     simp only [zero_sub, abs_neg]
     rw [extremalTest, ite_eq_left hvabs]
   rw [hcongr]
-  -- pull constant c out
   set c : ℝ := (Real.sqrt 2 * Real.sin (1 / Real.sqrt 2))⁻¹ with hc
   have hcpos : 0 < Real.sqrt 2 * Real.sin (1 / Real.sqrt 2) := mul_pos h2 hsin_pos
   have hcne : Real.sqrt 2 * Real.sin (1 / Real.sqrt 2) ≠ 0 := ne_of_gt hcpos
@@ -73,17 +67,13 @@ lemma extremalG_zero : extremalG 0 = montgomeryTaylorConst := by
     simp only [hc]
     field_simp
   rw [hrw]
-  -- integrability of |v| cos(√2 v)
   have hcontabs : Continuous (fun v : ℝ => |v| * Real.cos (Real.sqrt 2 * v)) := by
     exact (continuous_abs.mul (by continuity))
-  -- compute the elementary integral I := ∫ |v| cos(√2 v) = sin(1/√2)/√2 + cos(1/√2) - 1
   have hI : (∫ v in (-(1:ℝ)/2)..(1/2), |v| * Real.cos (Real.sqrt 2 * v))
       = Real.sin (1 / Real.sqrt 2) / Real.sqrt 2 + Real.cos (1 / Real.sqrt 2) - 1 := by
-    -- split at 0
     rw [← intervalIntegral.integral_add_adjacent_intervals
       (a := -(1:ℝ)/2) (b := 0) (c := 1/2)
       (hcontabs.intervalIntegrable _ _) (hcontabs.intervalIntegrable _ _)]
-    -- left piece: on [-1/2,0], |v| = -v
     have hleft : (∫ v in (-(1:ℝ)/2)..(0:ℝ), |v| * Real.cos (Real.sqrt 2 * v))
         = ∫ v in (-(1:ℝ)/2)..(0:ℝ), (-v) * Real.cos (Real.sqrt 2 * v) := by
       apply intervalIntegral.integral_congr
@@ -99,7 +89,6 @@ lemma extremalG_zero : extremalG 0 = montgomeryTaylorConst := by
       simp only
       rw [abs_of_nonneg (show (0:ℝ) ≤ v by linarith [hv.1])]
     rw [hleft, hright]
-    -- ∫ v cos = F b - F a
     have hFderiv : ∀ x ∈ Set.uIcc (0:ℝ) (1/2), HasDerivAt F (x * Real.cos (Real.sqrt 2 * x)) x :=
       fun x _ => hasDerivAt_vcos x
     have hFderiv2 : ∀ x ∈ Set.uIcc (-(1:ℝ)/2) (0:ℝ),
@@ -117,7 +106,6 @@ lemma extremalG_zero : extremalG 0 = montgomeryTaylorConst := by
       apply intervalIntegral.integral_congr
       intro v _; ring
     rw [hint_left, hint_right]
-    -- now evaluate F at endpoints
     simp only [hF]
     rw [show Real.sqrt 2 * (1/2 : ℝ) = 1 / Real.sqrt 2 from hkey]
     rw [show Real.sqrt 2 * (-(1:ℝ)/2) = -(1 / Real.sqrt 2) by rw [← hkey]; ring]
@@ -126,10 +114,8 @@ lemma extremalG_zero : extremalG 0 = montgomeryTaylorConst := by
     field_simp
     ring
   rw [hI]
-  -- extremalTest 0 = 1 / (√2 sin(1/√2))
   rw [extremalTest, ite_eq_left (by norm_num : |(0:ℝ)| ≤ 1 / 2)]
   rw [show Real.sqrt 2 * (0:ℝ) = 0 by ring, Real.cos_zero]
-  -- assemble
   rw [montgomeryTaylorConst, Real.cot_eq_cos_div_sin]
   simp only [hc]
   field_simp

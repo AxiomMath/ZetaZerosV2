@@ -12,11 +12,11 @@ public import ZetaZeros.Zeta.Defs
 # Finiteness of the zero set up to a height
 
 The non-trivial zeros with imaginary part in `(0, T]` form a finite set, and each has positive
-multiplicity. This is what lets the rescaled zeros be a finite multiset, which every statement of
-the key proposition requires.
+multiplicity.
 
-Finiteness comes from Mathlib's `IsCompact.inter_riemannZetaZeros_finite`, the region being
-bounded.
+## Main results
+
+* `nontrivialZeros_finite`: the set `nontrivialZeros T` is finite.
 -/
 
 @[expose] public section

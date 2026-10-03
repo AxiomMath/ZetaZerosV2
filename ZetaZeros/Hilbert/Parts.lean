@@ -11,11 +11,9 @@ public import ZetaZeros.Hilbert.Support
 /-!
 # Splitting the support
 
-Two facts the key proposition rests on: a conjugation-stable set of non-real points has even
-cardinality, and the support splits into its simple real, multiple real and non-real parts.
-
-The evenness argument is stated over the hypotheses it actually consumes -- closed under
-conjugation, no real point -- so that `nonRealPart`, `𝒮₁` and `𝒮₂` all go through it once.
+A conjugation-stable set of non-real points has even cardinality; the support splits into its
+simple real, multiple real and non-real parts, and the non-real part splits by multiplicity into
+the simple and multiple non-real parts.
 -/
 
 @[expose] public section
@@ -26,7 +24,7 @@ variable {Z : Finset ℂ} {m : ℂ → ℕ}
 
 /-- The lower half of a conjugation-stable set of non-real points is the conjugate image of its
 upper half; conjugation has no fixed point there. -/
-theorem filter_not_pos_eq_image_filter_pos_of_conj_stable {E : Finset ℂ}
+private theorem filter_not_pos_eq_image_filter_pos_of_conj_stable {E : Finset ℂ}
     (hre : ∀ z ∈ E, z.im ≠ 0) (hconj : ∀ z ∈ E, (starRingEnd ℂ) z ∈ E) :
     (E.filter fun z => ¬ 0 < z.im) = (E.filter fun z => 0 < z.im).image (starRingEnd ℂ) := by
   classical
@@ -44,9 +42,8 @@ theorem filter_not_pos_eq_image_filter_pos_of_conj_stable {E : Finset ℂ}
     rw [Complex.conj_im, not_lt]
     linarith
 
-/-- **A conjugation-stable set of non-real points has even cardinality**
-(`lem_conj_stable_even`). Conjugation restricts to a fixed-point-free involution of it, so its
-orbits all have two elements and they partition it. -/
+/-- **A conjugation-stable set of non-real points has even cardinality.** Conjugation restricts to
+a fixed-point-free involution of it, so its orbits all have two elements and they partition it. -/
 @[zz_tag "lem_conj_stable_even"]
 theorem two_dvd_card_of_conj_stable {E : Finset ℂ}
     (hre : ∀ z ∈ E, z.im ≠ 0) (hconj : ∀ z ∈ E, (starRingEnd ℂ) z ∈ E) :
@@ -59,7 +56,7 @@ theorem two_dvd_card_of_conj_stable {E : Finset ℂ}
 
 /-- The real part of the support splits by multiplicity into the simple and the multiple real
 parts. Multiplicities are at least one on the support, which is what rules out a third case. -/
-theorem allRealPart_filter_mult_eq (hZ : IsConjInvariant Z m) :
+private theorem allRealPart_filter_mult_eq (hZ : IsConjInvariant Z m) :
     ((allRealPart Z).filter fun z => m z = 1) = simpleRealPart Z m ∧
       ((allRealPart Z).filter fun z => ¬ m z = 1) = multipleRealPart Z m := by
   classical
@@ -75,9 +72,8 @@ theorem allRealPart_filter_mult_eq (hZ : IsConjInvariant Z m) :
     · rintro ⟨hz, him, hle⟩
       exact ⟨⟨hz, him⟩, by omega⟩
 
-/-- **The support splits into its real and non-real parts** (`lem_Z_partition`). Stated as the
-decomposition of a sum, which is the form every consumer needs: the three parts are pairwise
-disjoint and cover `Z`. -/
+/-- **The support splits into its simple real, multiple real and non-real parts**, as a
+decomposition of a sum over `Z`: the three parts are pairwise disjoint and cover `Z`. -/
 @[zz_tag "lem_Z_partition"]
 theorem sum_eq_sum_simpleRealPart_add_sum_multipleRealPart_add_sum_nonRealPart
     {M : Type*} [AddCommMonoid M] (hZ : IsConjInvariant Z m) (f : ℂ → M) :
@@ -96,7 +92,7 @@ theorem sum_eq_sum_simpleRealPart_add_sum_multipleRealPart_add_sum_nonRealPart
   rw [← hre, ← hsplit]
 
 /-- The simple non-real part is conjugation-stable. -/
-theorem conj_mem_simpleNonRealPart (hZ : IsConjInvariant Z m) {z : ℂ}
+private theorem conj_mem_simpleNonRealPart (hZ : IsConjInvariant Z m) {z : ℂ}
     (hz : z ∈ simpleNonRealPart Z m) : (starRingEnd ℂ) z ∈ simpleNonRealPart Z m := by
   simp only [simpleNonRealPart, Finset.mem_filter] at hz ⊢
   obtain ⟨hzZ, him, hone⟩ := hz
@@ -105,7 +101,7 @@ theorem conj_mem_simpleNonRealPart (hZ : IsConjInvariant Z m) {z : ℂ}
   · rw [hZ.mult_conj z hzZ]; exact hone
 
 /-- The multiple non-real part is conjugation-stable. -/
-theorem conj_mem_multipleNonRealPart (hZ : IsConjInvariant Z m) {z : ℂ}
+private theorem conj_mem_multipleNonRealPart (hZ : IsConjInvariant Z m) {z : ℂ}
     (hz : z ∈ multipleNonRealPart Z m) : (starRingEnd ℂ) z ∈ multipleNonRealPart Z m := by
   simp only [multipleNonRealPart, Finset.mem_filter] at hz ⊢
   obtain ⟨hzZ, him, htwo⟩ := hz
@@ -113,7 +109,7 @@ theorem conj_mem_multipleNonRealPart (hZ : IsConjInvariant Z m) {z : ℂ}
   · rw [Complex.conj_im]; exact neg_ne_zero.mpr him
   · rw [hZ.mult_conj z hzZ]; exact htwo
 
-/-- **The simple non-real part has even cardinality** (`lem_S1_even`). -/
+/-- **The simple non-real part has even cardinality.** -/
 @[zz_tag "lem_S1_even"]
 theorem two_dvd_card_simpleNonRealPart (hZ : IsConjInvariant Z m) :
     2 ∣ (simpleNonRealPart Z m).card :=
@@ -121,7 +117,7 @@ theorem two_dvd_card_simpleNonRealPart (hZ : IsConjInvariant Z m) :
     (fun _z hz => (Finset.mem_filter.mp hz).2.1)
     (fun _ hz => conj_mem_simpleNonRealPart hZ hz)
 
-/-- **The multiple non-real part has even cardinality** (`lem_S2_even`). -/
+/-- **The multiple non-real part has even cardinality.** -/
 @[zz_tag "lem_S2_even"]
 theorem two_dvd_card_multipleNonRealPart (hZ : IsConjInvariant Z m) :
     2 ∣ (multipleNonRealPart Z m).card :=
@@ -129,8 +125,8 @@ theorem two_dvd_card_multipleNonRealPart (hZ : IsConjInvariant Z m) :
     (fun _z hz => (Finset.mem_filter.mp hz).2.1)
     (fun _ hz => conj_mem_multipleNonRealPart hZ hz)
 
-/-- **The non-real part splits by multiplicity** (`lem_S1_S2_partition`). Stated as the
-decomposition of a sum, which gives the cardinality identity by taking `f = 1`. -/
+/-- **The non-real part splits by multiplicity**, as a decomposition of a sum; with `f = 1` this is
+the cardinality identity. -/
 @[zz_tag "lem_S1_S2_partition"]
 theorem sum_nonRealPart_eq_sum_simpleNonRealPart_add_sum_multipleNonRealPart
     {M : Type*} [AddCommMonoid M] (hZ : IsConjInvariant Z m) (f : ℂ → M) :
@@ -154,9 +150,7 @@ theorem sum_nonRealPart_eq_sum_simpleNonRealPart_add_sum_multipleNonRealPart
   rw [h1, h2] at hsplit
   exact hsplit.symm
 
-/-- **The simple part counts the simple real and simple non-real points**
-(`lem_card_simple_part`). Needs no hypothesis on `m`: splitting the simple part by whether the
-point is real is unconditional. -/
+/-- **The simple part counts the simple real and simple non-real points.** -/
 @[zz_tag "lem_card_simple_part"]
 theorem card_simplePart_eq :
     (simplePart Z m).card = (simpleRealPart Z m).card + (simpleNonRealPart Z m).card := by
@@ -170,8 +164,8 @@ theorem card_simplePart_eq :
   rw [h1, h2] at hsplit
   omega
 
-/-- **The real part carries mass at least `n + 2r`** (`lem_real_mass_lower`). Multiplicity is one
-on the simple real part and at least two on the multiple real part. -/
+/-- **The real part carries mass at least `n + 2r`.** Multiplicity is one on the simple real part
+and at least two on the multiple real part. -/
 @[zz_tag "lem_real_mass_lower"]
 theorem le_sum_allRealPart (hZ : IsConjInvariant Z m) :
     ((simpleRealPart Z m).card : ℝ) + 2 * ((multipleRealPart Z m).card : ℝ)
@@ -201,8 +195,8 @@ theorem le_sum_allRealPart (hZ : IsConjInvariant Z m) :
       _ ≤ ∑ z ∈ multipleRealPart Z m, (m z : ℝ) := Finset.sum_le_sum htwo
   linarith
 
-/-- **The simple-or-real part carries mass at least `n + 2r + 2p`**
-(`lem_simple_or_real_mass_lower`). It is the real part together with the simple non-real part. -/
+/-- **The simple-or-real part carries mass at least `n + 2r + 2p`.** It is the real part together
+with the simple non-real part. -/
 @[zz_tag "lem_simple_or_real_mass_lower"]
 theorem le_sum_simpleOrRealPart (hZ : IsConjInvariant Z m) :
     ((simpleRealPart Z m).card : ℝ) + 2 * ((multipleRealPart Z m).card : ℝ)

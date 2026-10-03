@@ -10,12 +10,9 @@ public import ZetaZeros.Hilbert.Defs
 /-!
 # Symmetry of the twisted functions
 
-Conjugation acts on the twisted functions as reflection in the origin. This is the property that
-survives Gram–Schmidt and makes every Bessel coefficient real, which is what lets the source treat
-them with real inequalities rather than complex ones.
-
-Everything here follows from one computation, `conj_fz`: conjugating `fz eta z` reflects the
-argument and conjugates the twist.
+Conjugation acts on the twisted functions as reflection in the origin: conjugating `fz eta z`
+reflects the argument and conjugates the twist. Hence the twisted function at a real point, and the
+even and odd parts at every point, are symmetric.
 -/
 
 @[expose] public section
@@ -24,9 +21,8 @@ namespace ZetaZeros
 
 variable {lam : ℝ} {eta : ℝ → ℝ}
 
-/-- Conjugation reflects the argument and conjugates the twist. The single computation the three
-symmetry lemmas below rest on. -/
-theorem conj_fz (he : ∀ x, eta (-x) = eta x) (z : ℂ) (u : ℝ) :
+/-- Conjugation reflects the argument and conjugates the twist. -/
+private theorem conj_fz (he : ∀ x, eta (-x) = eta x) (z : ℂ) (u : ℝ) :
     (starRingEnd ℂ) (fz eta z u) = fz eta ((starRingEnd ℂ) z) (-u) := by
   simp only [fz, map_mul, Complex.conj_ofReal, ← Complex.exp_conj, map_neg, map_mul,
     Complex.conj_I, Complex.conj_ofReal, map_ofNat, he u, Complex.ofReal_neg]

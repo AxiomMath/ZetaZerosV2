@@ -11,10 +11,19 @@ public import ZetaZeros.Meta.Attr
 /-!
 # The Montgomery–Taylor constant is less than `1.3275`
 
-The single numerical input to both headline bounds. Since `(1/√2)² = 1/2` exactly, the values
-`cos(1/√2)` and `√2 sin(1/√2)` are alternating series with *rational* terms, so bounding them needs
-no estimate at an irrational argument: five terms bound the first from above, four bound the second
-from below, and the gap to `1.3275` is about `7 · 10⁻⁷`.
+Since `(1/√2)² = 1/2` exactly, the values `cos(1/√2)` and `√2 sin(1/√2)` are alternating series
+with *rational* terms: five terms bound the first from above, four bound the second from below,
+and the gap to `1.3275` is about `7 · 10⁻⁷`.
+
+## Main definitions
+
+* `montgomeryTaylorConst`: the Montgomery–Taylor constant `C_MT = 1/2 + (1/√2) cot(1/√2)`.
+* `simpleProportion`, `distinctProportion`: the proportions `C₀ = 2 - C_MT` and
+  `C₁ = 3/2 - C_MT/2`.
+
+## Main results
+
+* `montgomeryTaylorConst_lt`: `C_MT < 1.3275`.
 -/
 
 @[expose] public section
@@ -23,7 +32,6 @@ namespace ZetaZeros
 
 open Filter Finset
 
--- The factorial notation `n !` is scoped to `Nat`.
 open scoped Nat
 
 /-- The Montgomery–Taylor constant `1/2 + (1/√2) cot(1/√2) = 1.3274992963…`. -/
@@ -46,7 +54,7 @@ section Elementary
 
 private lemma sqrt_two_pos : 0 < Real.sqrt 2 := Real.sqrt_pos.mpr (by norm_num)
 
-/-- The whole point: `(1/√2)² = 1/2` on the nose, which is what makes the two series rational. -/
+/-- `(1/√2)² = 1/2`. -/
 private lemma inv_sqrt_two_sq : (1 / Real.sqrt 2) ^ 2 = 1 / 2 := by
   rw [div_pow, one_pow, Real.sq_sqrt (by norm_num : (0:ℝ) ≤ 2)]
 
@@ -96,8 +104,7 @@ theorem hasSum_sinTerm :
     field_simp
   rwa [hfun] at h
 
-/-- The terms `1 / (2ᵏ (2k)!)` of the series for `cos(1/√2)` decrease, which is what the
-alternating-series bracketing needs. -/
+/-- The terms of the `cos` series decrease. -/
 theorem cosTerm_antitone : Antitone cosTerm := by
   refine antitone_nat_of_succ_le fun n => ?_
   have hpos : (0:ℝ) < 2 ^ n * ((2 * n)! : ℝ) := by
@@ -159,8 +166,8 @@ theorem inv_sqrt_two_mul_cot_lt : (1 / Real.sqrt 2) * Real.cot (1 / Real.sqrt 2)
   rw [hcot, div_lt_iff₀ hden]
   linarith [cos_inv_sqrt_two_lt, sqrt_two_mul_sin_inv_sqrt_two_gt]
 
-/-- **The numerical input.** `C_MT < 1.3275`, which is exactly what both headline bounds need:
-`2 - 1.3275 = 0.6725` and `3/2 - 1.3275/2 = 0.83625`. -/
+/-- **The upper bound for the Montgomery–Taylor constant.** `C_MT < 1.3275`, so that
+`2 - C_MT > 0.6725` and `3/2 - C_MT/2 > 0.83625`. -/
 @[zz_tag "lem_cmt_upper"]
 theorem montgomeryTaylorConst_lt : montgomeryTaylorConst < 1.3275 := by
   have := inv_sqrt_two_mul_cot_lt

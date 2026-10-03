@@ -55,66 +55,62 @@ theorem prop_simple_or_real_lower {lam : ℝ} {eta : ℝ → ℝ} {Z : Finset �
 
 /-- **`thm_simple`.** Beyond a height depending on `ε`, the proportion of non-trivial zeros
 that are simple and lie on the critical line exceeds `C₀ - ε = 0.6725007037… - ε`. -/
-theorem thm_simple (hRvM : RiemannVonMangoldt) (hPC : PairCorrelation)
-    (ε : ℝ) (hε : 0 < ε) :
+theorem thm_simple (ε : ℝ) (hε : 0 < ε) :
     ∃ T₀ : ℝ, ∀ T ≥ T₀,
       3 / 2 - (1 / Real.sqrt 2) * Real.cot (1 / Real.sqrt 2) - ε <
         (simpleOnLineCount T : ℝ) / (zeroCount T : ℝ) :=
-  simple_proportion_lower hRvM hPC ε hε
+  simple_proportion_lower ε hε
 
 /-- **`thm_distinct`.** Beyond a height depending on `ε`, the proportion of non-trivial zeros
 that are distinct exceeds `C₁ - ε = 0.8362503518… - ε`. -/
-theorem thm_distinct (hRvM : RiemannVonMangoldt) (hPC : PairCorrelation)
-    (ε : ℝ) (hε : 0 < ε) :
+theorem thm_distinct (ε : ℝ) (hε : 0 < ε) :
     ∃ T₀ : ℝ, ∀ T ≥ T₀,
       5 / 4 - (1 / (2 * Real.sqrt 2)) * Real.cot (1 / Real.sqrt 2) - ε <
         (distinctZeroCount T : ℝ) / (zeroCount T : ℝ) :=
-  distinct_proportion_lower hRvM hPC ε hε
+  distinct_proportion_lower ε hε
 
 /-- **`thm_average`.** Beyond a height depending on `ε`, the average of the proportion of simple
 zeros and the proportion of zeros on the critical line exceeds `C₁ - ε = 0.8362503518… - ε`. -/
-theorem thm_average (hRvM : RiemannVonMangoldt) (hPC : PairCorrelation)
-    (ε : ℝ) (hε : 0 < ε) :
+theorem thm_average (ε : ℝ) (hε : 0 < ε) :
     ∃ T₀ : ℝ, ∀ T ≥ T₀,
       5 / 4 - (1 / (2 * Real.sqrt 2)) * Real.cot (1 / Real.sqrt 2) - ε <
         ((simpleZeroCount T : ℝ) + (onLineCount T : ℝ)) / (2 * (zeroCount T : ℝ)) :=
-  average_proportion_lower hRvM hPC ε hε
+  average_proportion_lower ε hε
 
 /-- **`thm_simple_or_critical`.** Beyond a height depending on `ε`, the proportion of non-trivial
 zeros that are simple or lie on the critical line (or both) exceeds
 `C₂ - ε = 0.8876200082… - ε`. -/
-theorem thm_simple_or_critical (hRvM : RiemannVonMangoldt) (hPC : PairCorrelation)
-    (ε : ℝ) (hε : 0 < ε) :
+theorem thm_simple_or_critical (ε : ℝ) (hε : 0 < ε) :
     ∃ T₀ : ℝ, ∀ T ≥ T₀,
       (4 + 2 * Real.sqrt 2 - Real.sqrt 2 * Real.cot (1 / Real.sqrt 2))
             / (3 + 2 * Real.sqrt 2) - ε <
         (simpleOrOnLineCount T : ℝ) / (zeroCount T : ℝ) :=
-  simpleOrOnLine_proportion_lower hRvM hPC ε hε
+  simpleOrOnLine_proportion_lower ε hε
 
 /-- **`thm_simple_numeric`.** Beyond some height, more than `67.25%` of the non-trivial zeros of
 the Riemann zeta function are simple and lie on the critical line. -/
-theorem thm_simple_numeric (hRvM : RiemannVonMangoldt) (hPC : PairCorrelation) :
+theorem thm_simple_numeric :
     ∃ T₀ : ℝ, ∀ T ≥ T₀, 0.6725 < (simpleOnLineCount T : ℝ) / (zeroCount T : ℝ) :=
-  simple_proportion_d4 hRvM hPC
+  simple_proportion_d4
 
 /-- **`thm_distinct_numeric`.** Beyond some height, more than `83.625%` of the non-trivial zeros
 of the Riemann zeta function are distinct. -/
-theorem thm_distinct_numeric (hRvM : RiemannVonMangoldt) (hPC : PairCorrelation) :
+theorem thm_distinct_numeric :
     ∃ T₀ : ℝ, ∀ T ≥ T₀, 0.83625 < (distinctZeroCount T : ℝ) / (zeroCount T : ℝ) :=
-  distinct_proportion_d5 hRvM hPC
+  distinct_proportion_d5
 
 /-- **`thm_average_numeric`.** Beyond some height, the average of the proportion of simple zeros
 and the proportion of zeros on the critical line exceeds `83.625%`. -/
-theorem thm_average_numeric (hRvM : RiemannVonMangoldt) (hPC : PairCorrelation) :
+theorem thm_average_numeric :
     ∃ T₀ : ℝ, ∀ T ≥ T₀,
       0.83625 < ((simpleZeroCount T : ℝ) + (onLineCount T : ℝ)) / (2 * (zeroCount T : ℝ)) :=
-  average_proportion_d5 hRvM hPC
+  average_proportion_d5
 
 /-- **`thm_simple_or_critical_numeric`.** Beyond some height, more than `88.76%` of the
 non-trivial zeros of the Riemann zeta function are simple or lie on the critical line (or
 both). -/
-theorem thm_simple_or_critical_numeric (hRvM : RiemannVonMangoldt) (hPC : PairCorrelation) :
+theorem thm_simple_or_critical_numeric :
     ∃ T₀ : ℝ, ∀ T ≥ T₀, 0.8876 < (simpleOrOnLineCount T : ℝ) / (zeroCount T : ℝ) :=
-  simpleOrOnLine_proportion_d4 hRvM hPC
+  simpleOrOnLine_proportion_d4
 
 end ZetaZeros.Challenge

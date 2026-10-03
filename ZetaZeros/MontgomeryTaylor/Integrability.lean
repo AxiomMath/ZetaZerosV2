@@ -29,12 +29,13 @@ lemma extremalTest_intervalIntegrable_gen (p q : ℝ) :
   exact lt_of_le_of_lt (measure_union_le _ _)
     (by exact ENNReal.add_lt_top.mpr ⟨measure_Icc_lt_top, measure_Icc_lt_top⟩)
 
-/-- `(β + t) · f₀ β` and `max(β+t, 0) · f₀ β` are interval-integrable on any interval. -/
+/-- `(β + t) · f₀ β` is interval-integrable on any interval. -/
 lemma linTest_intervalIntegrable (t p q : ℝ) :
     IntervalIntegrable (fun β => (β + t) * extremalTest β) MeasureTheory.volume p q :=
   (extremalTest_intervalIntegrable_gen p q).continuousOn_mul
     (by fun_prop : ContinuousOn (fun β => β + t) (Set.uIcc p q))
 
+/-- `max(β + t, 0) · f₀ β` is interval-integrable on any interval. -/
 lemma maxTest_intervalIntegrable (t p q : ℝ) :
     IntervalIntegrable (fun β => max (β + t) 0 * extremalTest β) MeasureTheory.volume p q :=
   (extremalTest_intervalIntegrable_gen p q).continuousOn_mul
@@ -54,7 +55,6 @@ lemma outer_intervalIntegrable (K : ℝ → ℝ → ℝ) (hK : Continuous (Funct
       MeasureTheory.volume (-(1:ℝ)/2) (1/2) := by
   apply ContinuousOn.intervalIntegrable
   apply extremalTest_continuousOn.mul
-  -- rewrite the inner kernel to the continuous cos-form on [-1/2,1/2]
   have hcont : Continuous (fun t => ∫ v in (-(1:ℝ)/2)..(1/2),
       K t v * (Real.cos (Real.sqrt 2 * v) / (Real.sqrt 2 * Real.sin (1 / Real.sqrt 2)))) := by
     apply intervalIntegral.continuous_parametric_intervalIntegral_of_continuous'

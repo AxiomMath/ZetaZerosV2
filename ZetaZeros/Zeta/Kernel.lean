@@ -10,7 +10,9 @@ public import Mathlib.Analysis.Fourier.FourierTransformDeriv
 public import ZetaZeros.Hilbert.AlphaExpansion
 public import ZetaZeros.MontgomeryTaylor.Basic
 public import ZetaZeros.Zeta.Asymptotics
-public import ZetaZeros.Defs
+public import ZetaZeros.Zeta.Inputs
+public import ZetaZeros.Zeta.CutoffSelfConv
+public import ZetaZeros.PairCorrelation.FromLandau
 public import ZetaZeros.Zeta.Cutoff
 public import ZetaZeros.Zeta.Finite
 public import ZetaZeros.Zeta.Mass
@@ -18,8 +20,26 @@ public import ZetaZeros.Zeta.Mass
 /-!
 # Construction of the pair-correlation kernel
 
-This file packages the unweighted pair sum, proves that the normalized cutoff is admissible, and
-develops the analytic identities needed to apply pair correlation.
+For a `delta`-cutoff `psi`, the normalised cutoff `cutoffTest psi` is an admissible test function,
+its unweighted kernel sum over the zeros is a combination of the pair-correlation sums of `Q_psi`
+and `Q_psi''`, and, normalised by `(T / 2π) log T`, it tends to `pairMainTerm Q_psi`. Letting the
+cutoff width tend to zero, `pairMainTerm Q_psi` tends to the Montgomery--Taylor constant.
+
+## Main definitions
+
+* `unweightedKernelSum`: the second moment of the test kernel over ordered pairs of zeros.
+
+## Main results
+
+* `unweightedKernelSum_cutoffTest_eq_pairCorrelationSum`: the kernel sum equals
+  `pairCorrelationSum Q_psi T - pairCorrelationSum Q_psi'' T / (4 (log T)²)`.
+* `PairCorrelation.tendsto`: the normalised pair-correlation sum tends to `pairMainTerm f`.
+* `unweightedKernelSum_cutoffTest_tendsto`: the normalised kernel sum tends to
+  `pairMainTerm Q_psi`.
+* `exists_cutoff_pairMainTerm_close`: `pairMainTerm Q_psi` is arbitrarily close to
+  `montgomeryTaylorConst`.
+* `kernelConstruction`: an admissible kernel whose normalised kernel sum tends to a constant
+  arbitrarily close to `montgomeryTaylorConst`.
 -/
 
 @[expose] public section
@@ -75,8 +95,7 @@ private lemma integrable_fourierC_integrand {f : ℝ → ℝ} (hf : Continuous f
   · fun_prop
   · exact hc.mul_right
 
-/-- Exponential twisting commutes with convolution. This is the complex-frequency bridge used
-to apply Mathlib's real-frequency convolution theorem. -/
+/-- Exponential twisting commutes with convolution. -/
 private lemma fourierTwist_convolution (b : ℝ) (f g : ℝ → ℝ) (x : ℝ) :
     fourierTwist b
         (convolution f g (ContinuousLinearMap.mul ℝ ℝ) volume) x =
@@ -207,15 +226,15 @@ private lemma integrable_cutoffWeight {delta : ℝ} {psi : ℝ → ℝ}
   exact hcont.integrableOn_Icc.integrable_of_forall_notMem_eq_zero hzero
 
 /-- The square of the normalized cutoff is integrable. -/
-lemma integrable_cutoffTestSq {delta : ℝ} (hd : 0 < delta) (hd4 : delta < 1 / 4)
+private lemma integrable_cutoffTestSq {delta : ℝ} (hd : 0 < delta) (hd4 : delta < 1 / 4)
     {psi : ℝ → ℝ} (hpsi : IsCutoff delta psi) : Integrable (cutoffTestSq psi) := by
   have hA : cutoffNormaliser psi ≠ 0 := ne_of_gt (cutoffNormaliser_pos hd hd4 hpsi)
   have hdiv : Integrable (fun x => psi x ^ 2 * extremalTest x / cutoffNormaliser psi) :=
     (integrable_cutoffWeight hpsi).div_const _
   exact hdiv.congr (Filter.Eventually.of_forall fun x => (cutoffTestSq_eq hd hd4 hpsi x).symm)
 
-/-- The normalized cutoff supplied by Section 6 is an admissible Hilbert-space test function. -/
-theorem cutoffTest_isAdmissible {delta : ℝ} (hd : 0 < delta) (hd4 : delta < 1 / 4)
+/-- The normalized cutoff is an admissible Hilbert-space test function. -/
+private theorem cutoffTest_isAdmissible {delta : ℝ} (hd : 0 < delta) (hd4 : delta < 1 / 4)
     {psi : ℝ → ℝ} (hpsi : IsCutoff delta psi) : IsAdmissible (1 / 2) (cutoffTest psi) := by
   refine ⟨?_, ?_, ?_, ?_⟩
   · refine (memLp_two_iff_integrable_sq ?_).2 ?_
@@ -246,7 +265,7 @@ private lemma cutoffTestSq_eq_smooth {delta : ℝ} (hd : 0 < delta) (hd4 : delta
     simp
 
 /-- The normalized square is smooth on the whole real line. -/
-lemma contDiff_cutoffTestSq {delta : ℝ} (hd : 0 < delta) (hd4 : delta < 1 / 4)
+private lemma contDiff_cutoffTestSq {delta : ℝ} (hd : 0 < delta) (hd4 : delta < 1 / 4)
     {psi : ℝ → ℝ} (hpsi : IsCutoff delta psi) :
     ContDiff ℝ (⊤ : ℕ∞) (cutoffTestSq psi) := by
   have hfun : cutoffTestSq psi = fun x =>
@@ -261,7 +280,7 @@ lemma contDiff_cutoffTestSq {delta : ℝ} (hd : 0 < delta) (hd4 : delta < 1 / 4)
     ((Real.contDiff_cos.comp (contDiff_const.mul contDiff_id)).div_const _)).div_const _
 
 /-- The normalized square has compact support in the cutoff interval. -/
-lemma hasCompactSupport_cutoffTestSq {delta : ℝ} {psi : ℝ → ℝ}
+private lemma hasCompactSupport_cutoffTestSq {delta : ℝ} {psi : ℝ → ℝ}
     (hpsi : IsCutoff delta psi) : HasCompactSupport (cutoffTestSq psi) := by
   refine HasCompactSupport.of_support_subset_isCompact
     (K := Set.Icc (-(1 / 2) : ℝ) (1 / 2)) isCompact_Icc ?_
@@ -274,12 +293,12 @@ lemma hasCompactSupport_cutoffTestSq {delta : ℝ} {psi : ℝ → ℝ}
   simp [cutoffTestSq, cutoffTest, hpsi.support x habs]
 
 /-- The normalized square is even. -/
-lemma cutoffTestSq_even {delta : ℝ} {psi : ℝ → ℝ} (hpsi : IsCutoff delta psi) (x : ℝ) :
+private lemma cutoffTestSq_even {delta : ℝ} {psi : ℝ → ℝ} (hpsi : IsCutoff delta psi) (x : ℝ) :
     cutoffTestSq psi (-x) = cutoffTestSq psi x := by
   simp only [cutoffTestSq, Pi.pow_apply, cutoffTest, hpsi.even x, extremalTest_even x]
 
 /-- The self-convolution is integrable. -/
-lemma integrable_cutoffSelfConv {delta : ℝ} (hd : 0 < delta) (hd4 : delta < 1 / 4)
+private lemma integrable_cutoffSelfConv {delta : ℝ} (hd : 0 < delta) (hd4 : delta < 1 / 4)
     {psi : ℝ → ℝ} (hpsi : IsCutoff delta psi) : Integrable (cutoffSelfConv psi) := by
   change Integrable
     (convolution (cutoffTestSq psi) (cutoffTestSq psi)
@@ -288,7 +307,7 @@ lemma integrable_cutoffSelfConv {delta : ℝ} (hd : 0 < delta) (hd4 : delta < 1 
     (ContinuousLinearMap.mul ℝ ℝ) (integrable_cutoffTestSq hd hd4 hpsi)
 
 /-- The self-convolution of the normalized square is even. -/
-lemma cutoffSelfConv_even {delta : ℝ} {psi : ℝ → ℝ} (hpsi : IsCutoff delta psi) (x : ℝ) :
+private lemma cutoffSelfConv_even {delta : ℝ} {psi : ℝ → ℝ} (hpsi : IsCutoff delta psi) (x : ℝ) :
     cutoffSelfConv psi (-x) = cutoffSelfConv psi x := by
   change convolution (cutoffTestSq psi) (cutoffTestSq psi)
       (ContinuousLinearMap.mul ℝ ℝ) volume (-x) =
@@ -299,7 +318,7 @@ lemma cutoffSelfConv_even {delta : ℝ} {psi : ℝ → ℝ} (hpsi : IsCutoff del
     (Filter.Eventually.of_forall (cutoffTestSq_even hpsi))
 
 /-- The self-convolution vanishes off `[-1, 1]`. -/
-lemma cutoffSelfConv_eq_zero_of_one_lt_abs {delta : ℝ} {psi : ℝ → ℝ}
+private lemma cutoffSelfConv_eq_zero_of_one_lt_abs {delta : ℝ} {psi : ℝ → ℝ}
     (hpsi : IsCutoff delta psi) (x : ℝ) (hx : 1 < |x|) : cutoffSelfConv psi x = 0 := by
   unfold cutoffSelfConv
   apply integral_eq_zero_of_ae
@@ -315,7 +334,7 @@ lemma cutoffSelfConv_eq_zero_of_one_lt_abs {delta : ℝ} {psi : ℝ → ℝ}
     simp [cutoffTestSq, cutoffTest, hpsi.support (x - t) hxt]
 
 /-- The second derivative of the self-convolution has compact support. -/
-lemma hasCompactSupport_iteratedDeriv_two_cutoffSelfConv {delta : ℝ} {psi : ℝ → ℝ}
+private lemma hasCompactSupport_iteratedDeriv_two_cutoffSelfConv {delta : ℝ} {psi : ℝ → ℝ}
     (hpsi : IsCutoff delta psi) :
     HasCompactSupport (iteratedDeriv 2 (cutoffSelfConv psi)) := by
   rw [iteratedDeriv_eq_iterate]
@@ -323,7 +342,7 @@ lemma hasCompactSupport_iteratedDeriv_two_cutoffSelfConv {delta : ℝ} {psi : �
     (hasCompactSupport_cutoffSelfConv hpsi).deriv.deriv
 
 /-- The second derivative of the self-convolution is integrable. -/
-lemma integrable_iteratedDeriv_two_cutoffSelfConv {delta : ℝ} (_hd : 0 < delta)
+private lemma integrable_iteratedDeriv_two_cutoffSelfConv {delta : ℝ} (_hd : 0 < delta)
     (_hd4 : delta < 1 / 4) {psi : ℝ → ℝ} (hpsi : IsCutoff delta psi) :
     Integrable (iteratedDeriv 2 (cutoffSelfConv psi)) :=
   ((contDiff_iteratedDeriv_two_cutoffSelfConv hpsi).continuous)
@@ -437,7 +456,7 @@ lemma correctedTest_weight_cancel {delta : ℝ} (hd : 0 < delta) (hd4 : delta < 
   field_simp [hden]
 
 /-- The second derivative of the self-convolution is even. -/
-lemma iteratedDeriv_two_cutoffSelfConv_even {delta : ℝ} {psi : ℝ → ℝ}
+private lemma iteratedDeriv_two_cutoffSelfConv_even {delta : ℝ} {psi : ℝ → ℝ}
     (hpsi : IsCutoff delta psi) (x : ℝ) :
     iteratedDeriv 2 (cutoffSelfConv psi) (-x) =
       iteratedDeriv 2 (cutoffSelfConv psi) x := by
@@ -449,7 +468,7 @@ lemma iteratedDeriv_two_cutoffSelfConv_even {delta : ℝ} {psi : ℝ → ℝ}
   simpa using hder
 
 /-- The second derivative of the self-convolution vanishes off `[-1, 1]`. -/
-lemma iteratedDeriv_two_cutoffSelfConv_eq_zero_of_one_lt_abs {delta : ℝ}
+private lemma iteratedDeriv_two_cutoffSelfConv_eq_zero_of_one_lt_abs {delta : ℝ}
     {psi : ℝ → ℝ} (hpsi : IsCutoff delta psi) (x : ℝ) (hx : 1 < |x|) :
     iteratedDeriv 2 (cutoffSelfConv psi) x = 0 := by
   have hevent : cutoffSelfConv psi =ᶠ[nhds x] (0 : ℝ → ℝ) := by
@@ -459,11 +478,14 @@ lemma iteratedDeriv_two_cutoffSelfConv_eq_zero_of_one_lt_abs {delta : ℝ}
   exact iteratedDeriv_const_zero
 
 /-- The self-convolution is an admissible pair-correlation test function. -/
-lemma cutoffSelfConv_isPairTestFunction {delta : ℝ} (hd : 0 < delta)
+private lemma cutoffSelfConv_isPairTestFunction {delta : ℝ} (hd : 0 < delta)
     (hd4 : delta < 1 / 4) {psi : ℝ → ℝ} (hpsi : IsCutoff delta psi) :
     IsPairTestFunction (cutoffSelfConv psi) := by
   refine ⟨cutoffSelfConv_even hpsi, integrable_cutoffSelfConv hd hd4 hpsi,
-    cutoffSelfConv_eq_zero_of_one_lt_abs hpsi, ?_⟩
+    ?_, ?_⟩
+  · obtain ⟨ε, hε, hzero⟩ := exists_cutoffSelfConv_eq_zero_of_one_sub_le_abs hpsi
+    refine ⟨min ε (1 / 2), lt_min hε (by norm_num), lt_of_le_of_lt (min_le_right _ _) (by norm_num),
+      fun x hx => hzero x (le_trans (by linarith [min_le_left ε (1 / 2 : ℝ)]) hx)⟩
   obtain ⟨C, hC⟩ := (contDiff_cutoffSelfConv hpsi).lipschitzWith_of_hasCompactSupport
     (hasCompactSupport_cutoffSelfConv hpsi) (by simp)
   refine ⟨C, fun x => ?_⟩
@@ -471,20 +493,24 @@ lemma cutoffSelfConv_isPairTestFunction {delta : ℝ} (hd : 0 < delta)
 
 /-- The second derivative of the self-convolution is an admissible pair-correlation test
 function. -/
-lemma iteratedDeriv_two_cutoffSelfConv_isPairTestFunction {delta : ℝ} (hd : 0 < delta)
+private lemma iteratedDeriv_two_cutoffSelfConv_isPairTestFunction {delta : ℝ} (hd : 0 < delta)
     (hd4 : delta < 1 / 4) {psi : ℝ → ℝ} (hpsi : IsCutoff delta psi) :
     IsPairTestFunction (iteratedDeriv 2 (cutoffSelfConv psi)) := by
   refine ⟨iteratedDeriv_two_cutoffSelfConv_even hpsi,
     integrable_iteratedDeriv_two_cutoffSelfConv hd hd4 hpsi,
-    iteratedDeriv_two_cutoffSelfConv_eq_zero_of_one_lt_abs hpsi, ?_⟩
+    ?_, ?_⟩
+  · obtain ⟨ε, hε, hzero⟩ :=
+      exists_iteratedDeriv_two_cutoffSelfConv_eq_zero_of_one_sub_le_abs hpsi
+    refine ⟨min ε (1 / 2), lt_min hε (by norm_num), lt_of_le_of_lt (min_le_right _ _) (by norm_num),
+      fun x hx => hzero x (le_trans (by linarith [min_le_left ε (1 / 2 : ℝ)]) hx)⟩
   obtain ⟨C, hC⟩ :=
     (contDiff_iteratedDeriv_two_cutoffSelfConv hpsi).lipschitzWith_of_hasCompactSupport
       (hasCompactSupport_iteratedDeriv_two_cutoffSelfConv hpsi) (by simp)
   refine ⟨C, fun x => ?_⟩
   simpa only [Real.norm_eq_abs, sub_zero] using hC.norm_sub_le x 0
 
-/-- The unweighted kernel sum is the difference of the two pair-correlation sums supplied by
-the corrected test function: the linear expansion of the kernel. -/
+/-- For `T > 1`, the unweighted kernel sum of `cutoffTest psi` equals
+`pairCorrelationSum Q_psi T - pairCorrelationSum Q_psi'' T / (4 (log T)²)`. -/
 @[zz_tag "lem_sum_expansion"]
 lemma unweightedKernelSum_cutoffTest_eq_pairCorrelationSum {delta : ℝ} (hd : 0 < delta)
     (hd4 : delta < 1 / 4) {psi : ℝ → ℝ} (hpsi : IsCutoff delta psi)
@@ -536,13 +562,14 @@ lemma unweightedKernelSum_cutoffTest_eq_pairCorrelationSum {delta : ℝ} (hd : 0
   rw [← hcancel, hlinear]
   ring
 
-/-- The quantitative pair-correlation hypothesis implies convergence to its stated main term. -/
-lemma PairCorrelation.tendsto (hPC : PairCorrelation) {f : ℝ → ℝ}
+/-- For an admissible test function `f`, the pair-correlation sum of `f` divided by
+`(T / 2π) log T` tends to `pairMainTerm f`. -/
+lemma PairCorrelation.tendsto {f : ℝ → ℝ}
     (hf : IsPairTestFunction f) :
     Filter.Tendsto
       (fun T => pairCorrelationSum f T / ((zeroScale T : ℝ) : ℂ))
       Filter.atTop (nhds ((pairMainTerm f : ℝ) : ℂ)) := by
-  obtain ⟨C, hC, T0, hbound⟩ := hPC f hf
+  obtain ⟨C, hC, T0, hbound⟩ := pairCorrelationFormula f hf
   have hsqrtlog : Filter.Tendsto (fun T : ℝ => Real.sqrt (Real.log T))
       Filter.atTop Filter.atTop :=
     Real.tendsto_sqrt_atTop.comp Real.tendsto_log_atTop
@@ -568,16 +595,15 @@ lemma PairCorrelation.tendsto (hPC : PairCorrelation) {f : ℝ → ℝ}
   · simp
 
 /-- The normalized unweighted cutoff-kernel sum converges to the pair-correlation functional of
-the self-convolution. The second-derivative correction vanishes because of its `log T` squared
-denominator. -/
+the self-convolution. -/
 @[zz_tag "lem_sum_asymp"]
-lemma unweightedKernelSum_cutoffTest_tendsto (hPC : PairCorrelation) {delta : ℝ}
+lemma unweightedKernelSum_cutoffTest_tendsto {delta : ℝ}
     (hd : 0 < delta) (hd4 : delta < 1 / 4) {psi : ℝ → ℝ} (hpsi : IsCutoff delta psi) :
     Filter.Tendsto
       (fun T => unweightedKernelSum (cutoffTest psi) T / ((zeroScale T : ℝ) : ℂ))
       Filter.atTop (nhds ((pairMainTerm (cutoffSelfConv psi) : ℝ) : ℂ)) := by
-  have hQ := hPC.tendsto (cutoffSelfConv_isPairTestFunction hd hd4 hpsi)
-  have hQ2 := hPC.tendsto
+  have hQ := PairCorrelation.tendsto (cutoffSelfConv_isPairTestFunction hd hd4 hpsi)
+  have hQ2 := PairCorrelation.tendsto
     (iteratedDeriv_two_cutoffSelfConv_isPairTestFunction hd hd4 hpsi)
   have hlog_sq : Filter.Tendsto (fun T : ℝ => Real.log T ^ 2)
       Filter.atTop Filter.atTop :=
@@ -626,9 +652,9 @@ lemma unweightedKernelSum_cutoffTest_tendsto (hPC : PairCorrelation) {delta : �
 
 /-! ## Removing the cutoff
 
-The last step of the construction is `lem_C_delta_limit`. We choose a cutoff at scale
-`1 / (n + 5)`, use dominated convergence first for its normalising constant and then for the two
-convolution integrals, and finally pass to the pair-correlation functional.
+Along cutoffs of width `1 / (n + 5)`, the normalising constants tend to `1`, the self-convolutions
+tend to `extremalSelfConv`, and `pairMainTerm` of the self-convolutions tends to
+`pairMainTerm extremalSelfConv`, the Montgomery--Taylor constant.
 -/
 
 /-- The extremal density is integrable on the real line. -/
@@ -762,8 +788,7 @@ private lemma cutoffNormaliser_eventually_gt_half :
   (tendsto_order.1 cutoffNormaliser_tendsto_one).1 _ (by norm_num)
 
 /-- Away from the two endpoints, the normalised cutoff densities converge to the extremal
-density.  Since the endpoints form a null set, this is exactly the almost-everywhere convergence
-needed below. -/
+density; in particular they converge almost everywhere. -/
 private lemma ae_cutoffTestSq_tendsto : ∀ᵐ x : ℝ,
     Filter.Tendsto (fun n => cutoffTestSq (cutoffFamily n) x)
       Filter.atTop (nhds (extremalTest x)) := by
@@ -944,8 +969,9 @@ private lemma cutoffPairMainTerm_tendsto :
   simpa only [pairMainTerm] using
     (cutoffSelfConv_tendsto 0).add (cutoffSelfConv_interval_tendsto.const_mul 2)
 
-/-- **The cutoff constants converge to the Montgomery--Taylor constant**
-(`lem_C_delta_limit`). -/
+/-- **The cutoff constants converge to the Montgomery--Taylor constant.** For every `ε > 0` there
+is a `delta`-cutoff `psi` with `0 < delta < 1/4` and
+`|pairMainTerm Q_psi - montgomeryTaylorConst| < ε`. -/
 @[zz_tag "lem_C_delta_limit"]
 theorem exists_cutoff_pairMainTerm_close (ε : ℝ) (hε : 0 < ε) :
     ∃ delta : ℝ, ∃ psi : ℝ → ℝ,
@@ -963,11 +989,11 @@ theorem exists_cutoff_pairMainTerm_close (ε : ℝ) (hε : 0 < ε) :
     cutoffDelta_lt_quarter N, cutoffFamily_isCutoff N, ?_⟩
   simpa only [Real.dist_eq] using hN N le_rfl
 
-/-- **Kernel construction** (`lem_kernel_construction`).  The cutoff test is admissible, its
-pair-correlation constant is arbitrarily close to the Montgomery--Taylor constant, and the
-normalized unweighted kernel sum converges to that constant. -/
+/-- **Kernel construction.** For every `ε > 0` there are an admissible `eta` and a `C` with
+`|C - montgomeryTaylorConst| < ε` such that `Re (unweightedKernelSum eta T) / ((T / 2π) log T)`
+tends to `C`. -/
 @[zz_tag "lem_kernel_construction"]
-theorem kernelConstruction (hPC : PairCorrelation) (ε : ℝ) (hε : 0 < ε) :
+theorem kernelConstruction (ε : ℝ) (hε : 0 < ε) :
     ∃ eta C,
       IsAdmissible (1 / 2) eta ∧
       |C - montgomeryTaylorConst| < ε ∧
@@ -983,7 +1009,7 @@ theorem kernelConstruction (hPC : PairCorrelation) (ε : ℝ) (hε : 0 < ε) :
       Filter.atTop (nhds (pairMainTerm (cutoffSelfConv psi))) :=
     (Complex.continuous_re.tendsto
       ((pairMainTerm (cutoffSelfConv psi) : ℝ) : ℂ)).comp
-        (unweightedKernelSum_cutoffTest_tendsto hPC hd hd4 hpsi)
+        (unweightedKernelSum_cutoffTest_tendsto hd hd4 hpsi)
   convert hreal using 1
   funext T
   exact (Complex.div_ofReal_re _ _).symm

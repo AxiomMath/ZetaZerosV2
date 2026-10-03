@@ -7,20 +7,19 @@ module
 
 public import Mathlib.MeasureTheory.Integral.Bochner.Basic
 public import Mathlib.MeasureTheory.Measure.Lebesgue.Basic
-public import ZetaZeros.Defs
+public import ZetaZeros.Meta.Attr
+public import ZetaZeros.Definitions
 
 /-!
-# The twisted functions behind the Hilbert space inequality
+# The vocabulary of the Hilbert space inequality
 
-The apparatus the source's key proposition is proved with: a test function twisted by a point of
-the support, split into its even and odd parts, and the two-variable kernel they assemble into.
-The objects the proposition is *stated* with are in `ZetaZeros/Defs.lean`.
+The objects of the key proposition, which concerns a finite conjugation-invariant multiset of
+complex numbers and a test function; no zeta function appears.
 
 A multiset is presented by its finite support `Z` together with a multiplicity function `m`, so
-every sum is written over a finite set with explicit weights. That is what removes the source's
-bookkeeping over conjugate pairs: because `gz` is conjugation-invariant and `hz` anti-invariant, a
-sum over the whole non-real part equals twice a sum over representatives, with no choice of
-representatives to make.
+every sum is over a finite set with explicit weights. Because `gz` is conjugation-invariant and
+`hz` anti-invariant, a sum over the whole non-real part equals twice a sum over representatives of
+the conjugate pairs.
 -/
 
 @[expose] public section
@@ -42,8 +41,7 @@ noncomputable def gz (eta : ℝ → ℝ) (z : ℂ) (u : ℝ) : ℂ :=
 noncomputable def hz (eta : ℝ → ℝ) (z : ℂ) (u : ℝ) : ℂ :=
   (fz eta z u - fz eta ((starRingEnd ℂ) z) u) / (2 * Complex.I)
 
-/-- A function `ℝ → ℂ` is symmetric when conjugation acts as reflection: `conj (Φ u) = Φ (-u)`.
-The property is preserved by Gram–Schmidt and is what makes the Bessel coefficients real. -/
+/-- A function `ℝ → ℂ` is symmetric when conjugation acts as reflection: `conj (Φ u) = Φ (-u)`. -/
 @[zz_tag "def_symmetric"]
 def IsSymmetric (Φ : ℝ → ℂ) : Prop := ∀ u : ℝ, (starRingEnd ℂ) (Φ u) = Φ (-u)
 

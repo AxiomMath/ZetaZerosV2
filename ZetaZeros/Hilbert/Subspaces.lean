@@ -12,13 +12,11 @@ public import ZetaZeros.Hilbert.L2
 # The three nested subspaces
 
 `U ⊆ V ⊆ W` inside `L²((-lam, lam))`, spanned by the twisted functions attached to the three parts
-of the support. These are the spaces the Gram–Schmidt process is run on, and the nesting is what
-makes an *adapted* orthonormal basis possible.
+of the support.
 
 Each family is indexed by the whole of `nonRealPart Z` rather than by a choice of one point from
 each conjugate pair. That is legitimate because `gz` is conjugation-invariant and `hz` is
-conjugation-anti-invariant, so the span is unchanged — and it removes the enumeration
-`z₁, conj z₁, …, z_k, conj z_k` that the source has to carry.
+conjugation-anti-invariant, so the span is unchanged.
 -/
 
 @[expose] public section
