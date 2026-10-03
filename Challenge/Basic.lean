@@ -14,7 +14,7 @@ public import Mathlib.MeasureTheory.Function.LpSeminorm.Basic
 
 /-! # Simple zeros, critical zeros and distinct zeros of the Riemann zeta function
 
-Given two classical analytic inputs, four unconditional proportions of the non-trivial zeros:
+Four unconditional proportions of the non-trivial zeros:
 
 * more than `67.25%` are simple **and** lie on the critical line;
 * more than `83.625%` are distinct;
@@ -190,55 +190,6 @@ theorem prop_simple_or_real_lower {lam : ℝ} {eta : ℝ → ℝ} {Z : Finset �
 
 end Challenge
 
-/-! ## The two external inputs, as hypotheses
-
-* **Riemann--von Mangoldt**: E. C. Titchmarsh, *The theory of the Riemann zeta-function*,
-  Theorem 9.4.
-* **Unconditional pair correlation**: S. A. C. Baluyot, D. A. Goldston, A. I. Suriajaya and
-  C. L. Turnage-Butterbaugh, *An unconditional Montgomery theorem for pair correlation of zeros
-  of the Riemann zeta-function*, Acta Arith. **214** (2024), 357--376, **Lemma 5**.
-
-These two are the only assumptions.
--/
-
-/-- The weight `4 / (4 - z²)` carried by the unconditional pair-correlation formula. -/
-noncomputable def pairWeight (z : ℂ) : ℂ := 4 / (4 - z ^ 2)
-
-/-- The rescaled difference `i(ρ - ρ') log T / (2π)` of two zeros. -/
-noncomputable def rescaledDiff (T : ℝ) (ρ ρ' : ℂ) : ℂ :=
-  Complex.I * (ρ - ρ') * ((Real.log T / (2 * Real.pi) : ℝ) : ℂ)
-
-/-- The weighted sum of `fourierC f` over ordered pairs of non-trivial zeros with imaginary part
-in `(0, T]`, each zero counted with multiplicity. -/
-noncomputable def pairCorrelationSum (f : ℝ → ℝ) (T : ℝ) : ℂ :=
-  ∑ᶠ ρ ∈ nontrivialZeros T, ∑ᶠ ρ' ∈ nontrivialZeros T,
-    ((zeroMultiplicity ρ * zeroMultiplicity ρ' : ℕ) : ℂ) *
-      fourierC f (rescaledDiff T ρ ρ') * pairWeight (ρ - ρ')
-
-/-- The main term `f 0 + 2 ∫₀¹ α f α` of the pair-correlation formula. -/
-noncomputable def pairMainTerm (f : ℝ → ℝ) : ℝ := f 0 + 2 * ∫ α in (0:ℝ)..1, α * f α
-
-/-- A test function admissible for the pair-correlation formula: even, integrable, supported in
-`[-1, 1]`, and satisfying `|f x - f 0| ≤ C * |x|` for all `x`, not merely near `0`. -/
-def IsPairTestFunction (f : ℝ → ℝ) : Prop :=
-  (∀ x, f (-x) = f x) ∧ MeasureTheory.Integrable f ∧ (∀ x, 1 < |x| → f x = 0) ∧
-    ∃ C : ℝ, ∀ x, |f x - f 0| ≤ C * |x|
-
-/-- **The Riemann--von Mangoldt formula.** The number of non-trivial zeros up to height `T`,
-counted with multiplicity, is asymptotic to `(T / 2π) log T`. -/
-def RiemannVonMangoldt : Prop :=
-  ∀ ε > 0, ∃ T₀ : ℝ, ∀ T ≥ T₀,
-    |(zeroCount T : ℝ) / (T / (2 * Real.pi) * Real.log T) - 1| < ε
-
-/-- **The unconditional pair correlation formula.** For every admissible test function the
-weighted pair-correlation sum is `(T / 2π) log T` times its main term, with an error
-`O(1 / √log T)`. -/
-def PairCorrelation : Prop :=
-  ∀ f : ℝ → ℝ, IsPairTestFunction f →
-    ∃ C : ℝ, 0 < C ∧ ∃ T₀ : ℝ, ∀ T ≥ T₀,
-      ‖pairCorrelationSum f T / ((T / (2 * Real.pi) * Real.log T : ℝ) : ℂ) -
-          ((pairMainTerm f : ℝ) : ℂ)‖ ≤ C / Real.sqrt (Real.log T)
-
 /-! ## The main results
 
 The four proportions. The constants are spelled out in closed form; numerically
@@ -255,8 +206,7 @@ namespace Challenge
 
 /-- **`thm_simple`.** Beyond a height depending on `ε`, the proportion of non-trivial zeros
 that are simple and lie on the critical line exceeds `C₀ - ε = 0.6725007037… - ε`. -/
-theorem thm_simple (hRvM : RiemannVonMangoldt) (hPC : PairCorrelation)
-    (ε : ℝ) (hε : 0 < ε) :
+theorem thm_simple (ε : ℝ) (hε : 0 < ε) :
     ∃ T₀ : ℝ, ∀ T ≥ T₀,
       3 / 2 - (1 / Real.sqrt 2) * Real.cot (1 / Real.sqrt 2) - ε <
         (simpleOnLineCount T : ℝ) / (zeroCount T : ℝ) :=
@@ -264,8 +214,7 @@ theorem thm_simple (hRvM : RiemannVonMangoldt) (hPC : PairCorrelation)
 
 /-- **`thm_distinct`.** Beyond a height depending on `ε`, the proportion of non-trivial zeros
 that are distinct exceeds `C₁ - ε = 0.8362503518… - ε`. -/
-theorem thm_distinct (hRvM : RiemannVonMangoldt) (hPC : PairCorrelation)
-    (ε : ℝ) (hε : 0 < ε) :
+theorem thm_distinct (ε : ℝ) (hε : 0 < ε) :
     ∃ T₀ : ℝ, ∀ T ≥ T₀,
       5 / 4 - (1 / (2 * Real.sqrt 2)) * Real.cot (1 / Real.sqrt 2) - ε <
         (distinctZeroCount T : ℝ) / (zeroCount T : ℝ) :=
@@ -277,8 +226,7 @@ proportion of simple zeros and the proportion of zeros on the critical line exce
 
 In particular `max (N₀ T) (N_s T) ≥ (C₁ + o(1)) N T`: the argument does not say which of the two
 is the larger, only that the larger one is at least `83.625%`. -/
-theorem thm_average (hRvM : RiemannVonMangoldt) (hPC : PairCorrelation)
-    (ε : ℝ) (hε : 0 < ε) :
+theorem thm_average (ε : ℝ) (hε : 0 < ε) :
     ∃ T₀ : ℝ, ∀ T ≥ T₀,
       5 / 4 - (1 / (2 * Real.sqrt 2)) * Real.cot (1 / Real.sqrt 2) - ε <
         ((simpleZeroCount T : ℝ) + (onLineCount T : ℝ)) / (2 * (zeroCount T : ℝ)) :=
@@ -287,8 +235,7 @@ theorem thm_average (hRvM : RiemannVonMangoldt) (hPC : PairCorrelation)
 /-- **`thm_simple_or_critical`.** Beyond a height depending on `ε`, the proportion of
 non-trivial zeros that are simple or lie on the critical line (or both) exceeds
 `C₂ - ε = 0.8876200082… - ε`. -/
-theorem thm_simple_or_critical (hRvM : RiemannVonMangoldt) (hPC : PairCorrelation)
-    (ε : ℝ) (hε : 0 < ε) :
+theorem thm_simple_or_critical (ε : ℝ) (hε : 0 < ε) :
     ∃ T₀ : ℝ, ∀ T ≥ T₀,
       (4 + 2 * Real.sqrt 2 - Real.sqrt 2 * Real.cot (1 / Real.sqrt 2))
             / (3 + 2 * Real.sqrt 2) - ε <
@@ -306,19 +253,19 @@ by under `10⁻⁸`, so the five-place form would need `C_MT` to eight places ra
 
 /-- **`thm_simple_numeric`.** Beyond some height, more than `67.25%` of the non-trivial zeros of
 the Riemann zeta function are simple and lie on the critical line. -/
-theorem thm_simple_numeric (hRvM : RiemannVonMangoldt) (hPC : PairCorrelation) :
+theorem thm_simple_numeric :
     ∃ T₀ : ℝ, ∀ T ≥ T₀, 0.6725 < (simpleOnLineCount T : ℝ) / (zeroCount T : ℝ) :=
   sorry
 
 /-- **`thm_distinct_numeric`.** Beyond some height, more than `83.625%` of the non-trivial zeros
 of the Riemann zeta function are distinct. -/
-theorem thm_distinct_numeric (hRvM : RiemannVonMangoldt) (hPC : PairCorrelation) :
+theorem thm_distinct_numeric :
     ∃ T₀ : ℝ, ∀ T ≥ T₀, 0.83625 < (distinctZeroCount T : ℝ) / (zeroCount T : ℝ) :=
   sorry
 
 /-- **`thm_average_numeric`.** Beyond some height, the average of the proportion of simple zeros
 and the proportion of zeros on the critical line exceeds `83.625%`. -/
-theorem thm_average_numeric (hRvM : RiemannVonMangoldt) (hPC : PairCorrelation) :
+theorem thm_average_numeric :
     ∃ T₀ : ℝ, ∀ T ≥ T₀,
       0.83625 < ((simpleZeroCount T : ℝ) + (onLineCount T : ℝ)) / (2 * (zeroCount T : ℝ)) :=
   sorry
@@ -326,7 +273,7 @@ theorem thm_average_numeric (hRvM : RiemannVonMangoldt) (hPC : PairCorrelation) 
 /-- **`thm_simple_or_critical_numeric`.** Beyond some height, more than `88.76%` of the
 non-trivial zeros of the Riemann zeta function are simple or lie on the critical line (or
 both). -/
-theorem thm_simple_or_critical_numeric (hRvM : RiemannVonMangoldt) (hPC : PairCorrelation) :
+theorem thm_simple_or_critical_numeric :
     ∃ T₀ : ℝ, ∀ T ≥ T₀, 0.8876 < (simpleOrOnLineCount T : ℝ) / (zeroCount T : ℝ) :=
   sorry
 

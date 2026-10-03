@@ -9,15 +9,23 @@ public import Mathlib.Analysis.SpecialFunctions.Trigonometric.Bounds
 public import ZetaZeros.Numeric.MontgomeryTaylor
 
 /-!
-# The proportion of zeros that are simple or on the critical line
+# The third proportion, and the numeric inputs it needs
 
-The constant `C₂ = (4 + 2√2 - √2 cot(1/√2)) / (3 + 2√2)`, its closed form in terms of the
-Montgomery--Taylor constant, and the elementary bounds that place it above `0.8876`.
+The proportion `C₂` of zeros shown simple or on the critical line, its expression in terms of
+`C_MT`, and the bounds `C_MT > 1.25` and `C₂ > 0.8876`.
+
+## Main results
+
+* `montgomeryTaylorConst_gt`: `C_MT > 1.25`.
+* `simpleOrOnLineProportion_eq`: `C₂ = (5 + 2√2 - 2 C_MT) / (3 + 2√2)`.
+* `simpleOrOnLineProportion_gt`: `C₂ > 0.8876`.
 -/
 
 @[expose] public section
 
 namespace ZetaZeros
+
+open scoped Nat
 
 /-- The proportion of zeros shown simple or on the critical line,
 `(4 + 2√2 - √2 cot(1/√2)) / (3 + 2√2) = 0.8876200082…`. -/
@@ -25,13 +33,12 @@ namespace ZetaZeros
 noncomputable def simpleOrOnLineProportion : ℝ :=
   (4 + 2 * Real.sqrt 2 - Real.sqrt 2 * Real.cot (1 / Real.sqrt 2)) / (3 + 2 * Real.sqrt 2)
 
-/-- `√2 > 1.4142`, which is what the numeric bound on `C₂` needs: the margin there is
-`0.2248 * √2 > 0.3178`, and `0.2248 * 1.4142 = 0.31791216`. -/
+/-- `√2 > 1.4142`. -/
 @[zz_tag "lem_sqrt2_lower"]
 theorem sqrt_two_gt : (1.4142 : ℝ) < Real.sqrt 2 := by
   nlinarith [Real.sq_sqrt (by norm_num : (0:ℝ) ≤ 2), Real.sqrt_nonneg 2]
 
-/-- **Four terms bound `cos(1/√2)` from below** (`lem_cos_lower`). The partial sum is
+/-- **Four terms bound `cos(1/√2)` from below.** The partial sum is
 `0.760243055…`, and `range (2 * 2)` ends at an odd index, so the bracketing gives a lower bound. -/
 @[zz_tag "lem_cos_lower"]
 theorem cos_inv_sqrt_two_gt : 0.76 < Real.cos (1 / Real.sqrt 2) := by
@@ -41,12 +48,13 @@ theorem cos_inv_sqrt_two_gt : 0.76 < Real.cos (1 / Real.sqrt 2) := by
     norm_num [Finset.sum_range_succ, cosTerm, Nat.factorial]
   linarith
 
-/-- **The sine is dominated by its argument.** This is Mathlib's `Real.sin_lt`. -/
+/-- **The sine is dominated by its argument.** `sin x < x` for `x > 0`; this is Mathlib's
+`Real.sin_lt`. -/
 @[zz_tag "lem_sin_lt_self"]
 theorem sin_lt_self {x : ℝ} (hx : 0 < x) : Real.sin x < x := Real.sin_lt hx
 
 /-- `√2 sin(1/√2) < 1`, because `sin x < x` for positive `x`. -/
-theorem sqrt_two_mul_sin_inv_sqrt_two_lt_one :
+private theorem sqrt_two_mul_sin_inv_sqrt_two_lt_one :
     Real.sqrt 2 * Real.sin (1 / Real.sqrt 2) < 1 := by
   have hpos : (0:ℝ) < Real.sqrt 2 := by positivity
   have h := sin_lt_self (show (0:ℝ) < 1 / Real.sqrt 2 by positivity)
@@ -57,7 +65,8 @@ theorem sqrt_two_mul_sin_inv_sqrt_two_lt_one :
     _ = 1 := hid
 
 /-- `(1/√2) cot(1/√2) > 0.75`: the numerator exceeds `0.76` and the denominator is below `1`. -/
-theorem inv_sqrt_two_mul_cot_gt : 0.75 < (1 / Real.sqrt 2) * Real.cot (1 / Real.sqrt 2) := by
+private theorem inv_sqrt_two_mul_cot_gt : 0.75 < (1 / Real.sqrt 2) * Real.cot (1 / Real.sqrt 2) :=
+    by
   have hs : 0 < Real.sin (1 / Real.sqrt 2) := sin_inv_sqrt_two_pos
   have hden : 0 < Real.sqrt 2 * Real.sin (1 / Real.sqrt 2) := by positivity
   have hcot : (1 / Real.sqrt 2) * Real.cot (1 / Real.sqrt 2)
@@ -67,16 +76,14 @@ theorem inv_sqrt_two_mul_cot_gt : 0.75 < (1 / Real.sqrt 2) * Real.cot (1 / Real.
   rw [hcot, lt_div_iff₀ hden]
   linarith [cos_inv_sqrt_two_gt, sqrt_two_mul_sin_inv_sqrt_two_lt_one]
 
-/-- **`C_MT > 1.25`** (`lem_cmt_lower`). This is what makes the side condition `1 ≤ A < 2`
-manufacturable: with `A = C + ε/2` and `ε < 1/4`, `C > C_MT - ε/2 > 1`. -/
+/-- **`C_MT > 1.25`.** -/
 @[zz_tag "lem_cmt_lower"]
 theorem montgomeryTaylorConst_gt : 1.25 < montgomeryTaylorConst := by
   have := inv_sqrt_two_mul_cot_gt
   rw [montgomeryTaylorConst]
   linarith
 
-/-- **`C₂ = (5 + 2√2 - 2 C_MT) / (3 + 2√2)`** (`lem_C2_eq`). The whole content is `2/√2 = √2`,
-supplied here by rewriting `1/√2` as `√2/2` on both sides. -/
+/-- **`C₂ = (5 + 2√2 - 2 C_MT) / (3 + 2√2)`.** The identity amounts to `2/√2 = √2`. -/
 @[zz_tag "lem_C2_eq"]
 theorem simpleOrOnLineProportion_eq :
     simpleOrOnLineProportion
@@ -89,9 +96,7 @@ theorem simpleOrOnLineProportion_eq :
   rw [simpleOrOnLineProportion, montgomeryTaylorConst, hhalf]
   ring
 
-/-- **`C₂ > 0.8876`** (`lem_C2_lower`). Four decimal places, not five: `C_MT < 1.3275` gives only
-`C₂ > 0.887619766…`, which clears `0.8876` and does **not** clear `0.88762`. The margin is
-`0.2248 * √2 > 0.3178`, and `0.2248 * 1.4142 = 0.31791216`. -/
+/-- **`C₂ > 0.8876`.** From `C_MT < 1.3275` one gets `C₂ > 0.887619766…`. -/
 @[zz_tag "lem_C2_lower"]
 theorem simpleOrOnLineProportion_gt : 0.8876 < simpleOrOnLineProportion := by
   have hs : (1.4142 : ℝ) < Real.sqrt 2 := sqrt_two_gt

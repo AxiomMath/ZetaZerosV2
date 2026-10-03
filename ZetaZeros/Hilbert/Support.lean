@@ -5,15 +5,13 @@ Authors: Axiom Math
 -/
 module
 
-public import ZetaZeros.Defs
 public import ZetaZeros.Hilbert.Defs
 
 /-!
-# Selections of the non-real support by multiplicity
+# The non-real part split by multiplicity
 
-The non-real part of the support split by multiplicity into `𝒮₁` and `𝒮₂`. Together with the
-selections in `ZetaZeros/Defs.lean`, these are what the three-range estimates behind the key
-proposition sum over.
+The simple non-real part `simpleNonRealPart` (multiplicity one) and the multiple non-real part
+`multipleNonRealPart` (multiplicity at least two) of the support of a multiset.
 -/
 
 @[expose] public section

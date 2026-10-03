@@ -11,10 +11,10 @@ public import ZetaZeros.Hilbert.Parts
 /-!
 # The refined first-range bound
 
-Equation (2.11) of the source. Where `sum_alphaOf_re_first_lower` bounds the first-range coefficient
-sum below by `2|R₂| + |S|` using only `m ≥ 1` on the non-real part, the refinement here uses `m ≥ 2`
-on `S₂` and so gets `2|R₂| + |S₁| + 2|S₂|`. Only the closing cardinality step differs; the Parseval
-and Bessel work is the same.
+Equation (2.11) of the source: over the first `dim U` members of a symmetric adapted basis, the
+real parts of the Bessel coefficients sum to at least `2|R₂| + |S₁| + 2|S₂|`. This refines the
+bound `2|R₂| + |S|` of `sum_alphaOf_re_first_lower`, which uses only `m ≥ 1` on the non-real part,
+by using `m ≥ 2` on `S₂`.
 -/
 
 @[expose] public section
@@ -23,6 +23,8 @@ namespace ZetaZeros
 
 variable {lam : ℝ} {eta : ℝ → ℝ} {Z : Finset ℂ} {m : ℂ → ℕ}
 
+/-- **The refined first-range bound.** Summed over `j < dim U`, the real parts of the Bessel
+coefficients against a symmetric adapted basis are at least `2|R₂| + |S₁| + 2|S₂|`. -/
 @[zz_tag "lem_alpha_first_lower_refined"]
 theorem sum_alphaOf_re_first_lower_refined (h : IsAdmissible lam eta)
     (hZ : IsConjInvariant Z m)

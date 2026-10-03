@@ -14,6 +14,15 @@ name = "mathlib"
 scope = "leanprover-community"
 rev = "v4.34.0-rc2"
 
+# The classical analytic machinery Mathlib does not have: the rectangle argument
+# principle, the Hadamard product for `riemannXi`, bounds for zeta in and around the
+# critical strip, the Perron formula, and the prime number theorem with a remainder.
+# Pinned to the tag whose toolchain and Mathlib revision are identical to ours.
+[[require]]
+name = "PrimeNumberTheoremAnd"
+git = "https://github.com/AxiomMath/PrimeNumberTheoremAnd.git"
+rev = "v4.34.0-rc2"
+
 [[lean_lib]]
 name = "ZetaZeros"
 

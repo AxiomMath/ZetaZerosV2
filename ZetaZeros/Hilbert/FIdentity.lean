@@ -10,16 +10,13 @@ public import ZetaZeros.Hilbert.Defs
 /-!
 # The two-variable kernel in terms of even and odd parts
 
-The algebraic heart of `lem_alpha_expansion`: rewriting `F` so that the non-real points contribute
+`bigF_eq` rewrites the kernel `F` so that the non-real points contribute
 `g_z(u) g_z(v) - h_z(u) h_z(v)` rather than `f_z(u) f_z(v)`.
 
-The rewrite is **not** termwise — `f_z(u) f_z(v)` exceeds `g_z(u)g_z(v) - h_z(u)h_z(v)` by the cross
-term `i(g_z(u)h_z(v) + h_z(u)g_z(v))`. What makes it true is that conjugation is a fixed-point-free
-involution of the non-real part under which the cross term is *odd*, since `gz` is
-conjugation-invariant and `hz` anti-invariant. So the cross terms cancel in pairs and
-`Finset.sum_involution` kills the whole sum at once.
-
-This is the step that lets the source's factor of two over conjugate pairs disappear entirely.
+The rewrite is not termwise: `f_z(u) f_z(v)` exceeds `g_z(u)g_z(v) - h_z(u)h_z(v)` by the cross
+term `i(g_z(u)h_z(v) + h_z(u)g_z(v))`. Conjugation is a fixed-point-free involution of the
+non-real part under which the cross term is odd, since `gz` is conjugation-invariant and `hz`
+anti-invariant, so the cross terms cancel in pairs.
 -/
 
 @[expose] public section
@@ -55,7 +52,7 @@ theorem disjoint_realPart_nonRealPart :
 
 /-- The cross terms cancel over the non-real part: conjugation is a fixed-point-free involution
 there, and the cross term is odd under it. -/
-theorem sum_cross_eq_zero (hZ : IsConjInvariant Z m) (u v : ℝ) :
+private theorem sum_cross_eq_zero (hZ : IsConjInvariant Z m) (u v : ℝ) :
     ∑ z ∈ nonRealPart Z, (m z : ℂ) *
         (Complex.I * (gz eta z u * hz eta z v + hz eta z u * gz eta z v)) = 0 := by
   refine Finset.sum_involution (fun z _ => (starRingEnd ℂ) z) ?_ ?_ ?_ ?_

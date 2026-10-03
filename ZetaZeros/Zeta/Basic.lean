@@ -14,11 +14,10 @@ public import ZetaZeros.Zeta.Defs
 /-!
 # First properties of the extremal test function and the rescaling
 
-The extremal test function is strictly positive on its support — which is what makes its square
-root smooth, and hence the whole kernel construction possible — and the rescaling sends a zero to
-a real point exactly when that zero lies on the critical line.
+The extremal test function is strictly positive on `[-1/2, 1/2]`, and the rescaling sends a zero
+to a real point exactly when that zero lies on the critical line.
 
-From those, the normalised cutoff test function `η_ψ` and its square `f_ψ` are shown to be smooth,
+The normalised cutoff test function `η_ψ` and its square `f_ψ` are shown to be smooth,
 compactly supported in `(-1/2, 1/2)` and even — and then so is the self-convolution `Q_ψ`, on
 `(-1, 1)`, together with its second derivative.
 -/
@@ -63,25 +62,21 @@ theorem rescale_im_eq_zero_iff {T : ℝ} (hT : 1 < T) (ρ : ℂ) :
 
 /-! ### The normalised cutoff test function is smooth, compactly supported and even
 
-`lem_eta_psi_smooth`. The delicate point is `±1/2`: there `√f₀` is not smooth, because `f₀` jumps
-from a positive value down to `0`. What saves it is that a `δ`-cutoff VANISHES on a neighbourhood of
-every such point, so the product is locally constant there.
+At `±1/2` the function `√f₀` is not smooth, because `f₀` jumps from a positive value to `0`; the
+cutoff `ψ` vanishes on a neighbourhood of these points, so `η_ψ` is locally zero there.
 
-Stated without any hypothesis `0 < δ < 1/4`, and without positivity of `A_ψ`: none of the three is
-needed. When `A_ψ = 0` the division gives `η_ψ = 0`, which is smooth, supported anywhere and even.
-Dropping them is a genuine generalisation. -/
+The results hold for every `δ` and need no positivity of `A_ψ`: when `A_ψ = 0` the division gives
+`η_ψ = 0`. -/
 
-/-- Positivity of the normalising denominator of `f₀`, read off from `extremalTest_pos` at `0`
-rather than re-proved, so the library holds only one proof of it. -/
-theorem sqrt_two_mul_sin_pos : 0 < Real.sqrt 2 * Real.sin (1 / Real.sqrt 2) := by
+/-- The normalising denominator `√2 sin(1/√2)` of `f₀` is positive. -/
+private theorem sqrt_two_mul_sin_pos : 0 < Real.sqrt 2 * Real.sin (1 / Real.sqrt 2) := by
   have h := extremalTest_pos (x := 0) (by norm_num)
   rw [extremalTest, ite_eq_left (by norm_num : |(0 : ℝ)| ≤ 1 / 2), mul_zero, Real.cos_zero] at h
   exact one_div_pos.mp h
 
 /-- Off `[-1/2, 1/2]` the cutoff kills the product, so on ALL of `ℝ` the test function agrees with
-the expression that has `f₀`'s `if` removed. That representative is smooth wherever
-`cos (√2 x) > 0`, and the cutoff handles everywhere else. -/
-theorem cutoffTest_eq_unfolded {delta : ℝ} {psi : ℝ → ℝ} (h : IsCutoff delta psi) :
+the expression that has `f₀`'s `if` removed. -/
+private theorem cutoffTest_eq_unfolded {delta : ℝ} {psi : ℝ → ℝ} (h : IsCutoff delta psi) :
     cutoffTest psi = fun x => psi x * Real.sqrt (Real.cos (Real.sqrt 2 * x) /
       (Real.sqrt 2 * Real.sin (1 / Real.sqrt 2))) / Real.sqrt (cutoffNormaliser psi) := by
   funext x
@@ -178,8 +173,7 @@ theorem cutoffTestSq_neg {delta : ℝ} {psi : ℝ → ℝ} (h : IsCutoff delta p
 
 /-! ### The self-convolution `Q_psi`: smoothness, support, parity
 
-`lem_Q_psi_support`. `Q_psi` is `f_psi` convolved with itself, so Mathlib's convolution theory
-applies once `f_psi` is known smooth with compact support -- which is `lem_eta_psi_smooth`.
+`Q_psi` is the convolution of `f_psi` with itself, and `f_psi` is smooth with compact support.
 
 The support claim doubles: `f_psi` lives in `(-1/2, 1/2)`, so the convolution lives in `(-1, 1)`.
 The elementary reason is that the integrand `f_psi t * f_psi (x - t)` is identically zero when
@@ -194,16 +188,14 @@ section QPsi
 
 variable {delta : ℝ} {psi : ℝ → ℝ}
 
-/-- Outside `[-c, c]` the absolute value is at least `c`. Used repeatedly to turn a
-`HasCompactSupport.intro` obligation into the pointwise vanishing statement. -/
-theorem le_abs_of_notMem_Icc {c x : ℝ} (hx : x ∉ Set.Icc (-c) c) : c ≤ |x| := by
+/-- Outside `[-c, c]` the absolute value is at least `c`. -/
+private theorem le_abs_of_notMem_Icc {c x : ℝ} (hx : x ∉ Set.Icc (-c) c) : c ≤ |x| := by
   rcases le_or_gt c |x| with hle | hlt
   · exact hle
   · exact absurd (Set.mem_Icc.mpr (abs_le.mp hlt.le)) hx
 
-/-- `Q_psi` is Mathlib's convolution of `f_psi` with itself. Definitional, but it is what makes the
-convolution smoothness theorem applicable. -/
-theorem cutoffSelfConv_eq_convolution (psi : ℝ → ℝ) :
+/-- `Q_psi` is Mathlib's convolution of `f_psi` with itself. -/
+private theorem cutoffSelfConv_eq_convolution (psi : ℝ → ℝ) :
     cutoffSelfConv psi =
       convolution (cutoffTestSq psi) (cutoffTestSq psi) (ContinuousLinearMap.mul ℝ ℝ) volume := by
   funext x
@@ -254,7 +246,7 @@ theorem cutoffSelfConv_neg (h : IsCutoff delta psi) (x : ℝ) :
   rw [cutoffTestSq_neg h t, show (-x - t) = -(x - -t) by ring, cutoffTestSq_neg h]
 
 /-- **`Q_psi` is Lipschitz continuous at `0`** -- Lipschitz with some constant on some
-neighbourhood of `0`, which is what "Lipschitz continuous at `0`" means here. -/
+neighbourhood of `0`. -/
 @[zz_tag "lem_Q_psi_support"]
 theorem exists_lipschitzOnWith_cutoffSelfConv (h : IsCutoff delta psi) :
     ∃ K, ∃ t ∈ nhds (0 : ℝ), LipschitzOnWith K (cutoffSelfConv psi) t :=

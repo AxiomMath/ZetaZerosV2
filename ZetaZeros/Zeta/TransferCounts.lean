@@ -6,23 +6,32 @@ Authors: Axiom Math
 module
 
 public import ZetaZeros.Hilbert.AlphaExpansion
-public import ZetaZeros.Defs
 public import ZetaZeros.Hilbert.Support
 
 /-!
-# The rescaled zeros carry the simple and on-line counts
+# The rescaled zeros carry the three zero counts
 
-Each of these transports a count along the multiplicity-preserving bijection `rescale T`. A
-rescaled point is real exactly when the zero is on the critical line, and has multiplicity one
-exactly when the zero does, so each selection of the support corresponds to the matching selection
-of the zeros.
+The simple-zero count, the on-line count and the simple-or-on-line count of the zeros up to
+height `T` equal the corresponding counts of the rescaled zeros, along the multiplicity-preserving
+bijection `rescale T`. A rescaled point is real exactly when the zero is on the critical line, and
+has multiplicity one exactly when the zero does, so each selection of the support corresponds to
+the matching selection of the zeros.
+
+## Main results
+
+* `card_simplePart_rescaled_eq_simpleZeroCount`: the simple rescaled zeros number
+  `simpleZeroCount T`.
+* `sum_allRealPart_rescaled_eq_onLineCount`: the real rescaled zeros, with multiplicity, number
+  `onLineCount T`.
+* `sum_simpleOrRealPart_rescaled_eq_simpleOrOnLineCount`: the rescaled zeros that are simple or
+  real, with multiplicity, number `simpleOrOnLineCount T`.
 -/
 
 @[expose] public section
 
 namespace ZetaZeros
 
-/-- **The rescaled zeros carry the simple count** (`lem_Z_T_simple_count`). -/
+/-- **The rescaled zeros carry the simple count.** -/
 @[zz_tag "lem_Z_T_simple_count"]
 theorem card_simplePart_rescaled_eq_simpleZeroCount {T : ℝ} (hT : 1 < T) :
     (simplePart (rescaledZerosFinset T) (rescaledMult T)).card = simpleZeroCount T := by
@@ -48,8 +57,7 @@ theorem card_simplePart_rescaled_eq_simpleZeroCount {T : ℝ} (hT : 1 < T) :
   ext rho
   simp only [Set.Finite.mem_toFinset, Finset.mem_filter, Set.mem_ofPred_eq]
 
-/-- **The rescaled zeros carry the on-line mass** (`lem_Z_T_on_line_mass`). Counted with
-multiplicity, matching the source's `N₀`. -/
+/-- **The rescaled zeros carry the on-line mass**, counted with multiplicity: the count `N₀`. -/
 @[zz_tag "lem_Z_T_on_line_mass"]
 theorem sum_allRealPart_rescaled_eq_onLineCount {T : ℝ} (hT : 1 < T) :
     ∑ z ∈ allRealPart (rescaledZerosFinset T), rescaledMult T z = onLineCount T := by
@@ -75,8 +83,8 @@ theorem sum_allRealPart_rescaled_eq_onLineCount {T : ℝ} (hT : 1 < T) :
   rw [hset, Finset.sum_image fun a _ b _ hab => rescale_injective hT hab,
     Finset.sum_congr rfl hmul, onLineCount, ← finsum_mem_coe_finset, hcoe]
 
-/-- **The rescaled zeros carry the simple-or-on-line mass**
-(`lem_Z_T_simple_or_on_line_mass`). Counted with multiplicity, matching the source's `N_{s∪0}`. -/
+/-- **The rescaled zeros carry the simple-or-on-line mass**, counted with multiplicity: the count
+`N_{s∪0}`. -/
 @[zz_tag "lem_Z_T_simple_or_on_line_mass"]
 theorem sum_simpleOrRealPart_rescaled_eq_simpleOrOnLineCount {T : ℝ} (hT : 1 < T) :
     ∑ z ∈ simpleOrRealPart (rescaledZerosFinset T) (rescaledMult T), rescaledMult T z

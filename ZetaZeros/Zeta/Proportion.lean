@@ -10,9 +10,14 @@ public import ZetaZeros.Zeta.Asymptotics
 /-!
 # The final asymptotic passage
 
-This file contains the elementary last step of the argument. Once the zero count and kernel
-energy have their required normalized limits, the two finite-height inequalities turn into the
-claimed eventual proportion bounds.
+If `S(T) / N(T) → C`, then the finite-height inequalities `2 N - S ≤ A` and
+`3/2 N - S/2 ≤ A` give eventual lower bounds `2 - C - ε` and `3/2 - C/2 - ε` for `A(T) / N(T)`.
+
+## Main results
+
+* `tendsto_ratio_of_tendsto_div_scale`: limits of `N / scale` and `S / scale` give the limit of
+  `S / N`.
+* `eventually_simple_proportion`, `eventually_distinct_proportion`: the eventual proportion bounds.
 -/
 
 @[expose] public section

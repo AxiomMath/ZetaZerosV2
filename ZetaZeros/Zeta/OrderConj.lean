@@ -11,15 +11,19 @@ public import ZetaZeros.Zeta.Defs
 /-!
 # Conjugation preserves the multiplicity of a zero
 
-BOTH of the symmetries whose composition `ρ ↦ 1 - conj ρ` makes the rescaled zeros
-conjugation-invariant. The conjugation half is the cheap one: it follows from `riemannZeta_conj`
-together with the fact that pre- and post-composing with conjugation does not change an analytic
-order. The reflection half needs the functional equation, and needs the order to be transported
-across `ρ ↦ 1 - ρ`, for which Mathlib has nothing ready-made.
+The multiplicity of a zero of `ζ` is invariant under `ρ ↦ conj ρ` and, in the open critical
+strip, under `ρ ↦ 1 - ρ`. The first follows from `riemannZeta_conj`, the second from the functional
+equation.
 
-The three private lemmas below are adapted, with thanks, from
-`AxiomMath/PrimeNumberTheoremAnd`, `PrimeNumberTheoremAnd/IEANTN/KadiriZeroCounting.lean`, where
-they support the same statement for that project's own order function.
+The lemmas `hasDerivAt_conj_conj`, `analyticAt_conj_conj` and `analyticOrderAt_conj_conj` are
+adapted from `PrimeNumberTheoremAnd/IEANTN/KadiriZeroCounting.lean` in
+`AxiomMath/PrimeNumberTheoremAnd`.
+
+## Main results
+
+* `zeroMultiplicity_conj`: `ζ` has the same multiplicity at `conj ρ` as at `ρ`.
+* `zeroMultiplicity_one_sub`: for `0 < re ρ < 1`, `ζ` has the same multiplicity at `1 - ρ` as at
+  `ρ`.
 -/
 
 @[expose] public section
@@ -109,22 +113,14 @@ theorem zeroMultiplicity_conj {ρ : ℂ} (hρ : ρ ≠ 1) :
 
 /-! ### The functional equation preserves multiplicity
 
-`lem_order_one_sub`. No library has this. What Mathlib supplies is `riemannZeta_one_sub`, the
-functional equation in the form
-`zeta (1 - s) = functionalEqFactor s * zeta s`.
-
-Two things then have to be shown, and the second is the real work:
-
-* `functionalEqFactor` is analytic and NON-VANISHING on the strip. `Gamma` is non-zero where the
-  real part is positive, the `cpow` factor is an `exp`, and `cos (pi s / 2)` vanishes only at odd
-  integers -- none of which have real part strictly between `0` and `1`.
-* The order has to move ACROSS the reflection, from `rho` to `1 - rho`. Mathlib has no lemma for
-  that, so `analyticOrderAt_comp_const_sub` is proved here: the order of `w -> f (a - w)` at `z` is
-  the order of `f` at `a - z`. It is stated for a general `f` and `a` because nothing in it is about
-  zeta, and it is the piece worth reusing. -/
+The functional equation `zeta (1 - s) = functionalEqFactor s * zeta s` (`riemannZeta_one_sub`)
+has a factor `functionalEqFactor` that is analytic and non-vanishing on the open critical strip:
+`Gamma` is non-zero where the real part is positive, the `cpow` factor is an `exp`, and
+`cos (pi s / 2)` vanishes only at odd integers. The analytic order of `w ↦ f (a - w)` at `z` is
+the analytic order of `f` at `a - z` (`analyticOrderAt_comp_const_sub`). -/
 
 /-- One direction of the transport of the vanishing order along `w ↦ a - w`. -/
-theorem le_analyticOrderAt_comp_const_sub {f : ℂ → ℂ} {a z : ℂ} {n : ℕ}
+private theorem le_analyticOrderAt_comp_const_sub {f : ℂ → ℂ} {a z : ℂ} {n : ℕ}
     (h : (n : ℕ∞) ≤ analyticOrderAt f (a - z)) :
     (n : ℕ∞) ≤ analyticOrderAt (fun w => f (a - w)) z := by
   by_cases hf : AnalyticAt ℂ f (a - z)
@@ -147,7 +143,7 @@ theorem le_analyticOrderAt_comp_const_sub {f : ℂ → ℂ} {a z : ℂ} {n : ℕ
     simp
 
 /-- **Transport of the vanishing order along an affine reflection.** -/
-theorem analyticOrderAt_comp_const_sub (f : ℂ → ℂ) (a z : ℂ) :
+private theorem analyticOrderAt_comp_const_sub (f : ℂ → ℂ) (a z : ℂ) :
     analyticOrderAt (fun w => f (a - w)) z = analyticOrderAt f (a - z) := by
   refine le_antisymm (ENat.forall_natCast_le_iff_le.mp ?_)
     (ENat.forall_natCast_le_iff_le.mp ?_)
@@ -164,20 +160,20 @@ theorem analyticOrderAt_comp_const_sub (f : ℂ → ℂ) (a z : ℂ) :
 
 /-! ### The factor in the functional equation -/
 
-/-- The factor in `ζ (1 - s) = functionalEqFactor s * ζ s`, written with `exp` rather than `cpow`
-so that its analyticity is visible. -/
+/-- The factor in `ζ (1 - s) = functionalEqFactor s * ζ s`, namely
+`2 exp (-s log (2π)) Γ(s) cos (π s / 2)`. -/
 noncomputable def functionalEqFactor (s : ℂ) : ℂ :=
   2 * Complex.exp (Complex.log (2 * (Real.pi : ℂ)) * (-s)) * Complex.Gamma s *
     Complex.cos ((Real.pi : ℂ) * s / 2)
 
-theorem two_mul_pi_ne_zero : (2 * (Real.pi : ℂ)) ≠ 0 :=
+private theorem two_mul_pi_ne_zero : (2 * (Real.pi : ℂ)) ≠ 0 :=
   mul_ne_zero two_ne_zero (Complex.ofReal_ne_zero.mpr Real.pi_ne_zero)
 
-theorem zeta_one_sub_eq (s : ℂ) (hn : ∀ n : ℕ, s ≠ -(n : ℂ)) (h1 : s ≠ 1) :
+private theorem zeta_one_sub_eq (s : ℂ) (hn : ∀ n : ℕ, s ≠ -(n : ℂ)) (h1 : s ≠ 1) :
     riemannZeta (1 - s) = functionalEqFactor s * riemannZeta s := by
   rw [riemannZeta_one_sub hn h1, functionalEqFactor, Complex.cpow_def_of_ne_zero two_mul_pi_ne_zero]
 
-theorem differentiableOn_functionalEqFactor :
+private theorem differentiableOn_functionalEqFactor :
     DifferentiableOn ℂ functionalEqFactor {s : ℂ | 0 < s.re} := by
   intro s hs
   have hs' : ∀ m : ℕ, s ≠ -(m : ℂ) := by
@@ -196,12 +192,12 @@ theorem differentiableOn_functionalEqFactor :
         (((differentiableAt_const _).mul differentiableAt_id).div_const _))
   exact this.differentiableWithinAt
 
-theorem analyticAt_functionalEqFactor {ρ : ℂ} (h0 : 0 < ρ.re) :
+private theorem analyticAt_functionalEqFactor {ρ : ℂ} (h0 : 0 < ρ.re) :
     AnalyticAt ℂ functionalEqFactor ρ := by
   refine differentiableOn_functionalEqFactor.analyticAt ?_
   exact (isOpen_lt continuous_const Complex.continuous_re).mem_nhds h0
 
-theorem functionalEqFactor_ne_zero {ρ : ℂ} (h0 : 0 < ρ.re) (h1 : ρ.re < 1) :
+private theorem functionalEqFactor_ne_zero {ρ : ℂ} (h0 : 0 < ρ.re) (h1 : ρ.re < 1) :
     functionalEqFactor ρ ≠ 0 := by
   have hpi : (Real.pi : ℂ) ≠ 0 := Complex.ofReal_ne_zero.mpr Real.pi_ne_zero
   have hGamma : Complex.Gamma ρ ≠ 0 := Complex.Gamma_ne_zero_of_re_pos h0
@@ -234,9 +230,7 @@ the multiplicity of `1 - ρ` as a zero of `ζ` equals that of `ρ`. -/
 theorem zeroMultiplicity_one_sub {ρ : ℂ} (h0 : 0 < ρ.re) (h1 : ρ.re < 1) :
     zeroMultiplicity (1 - ρ) = zeroMultiplicity ρ := by
   have key : analyticOrderAt riemannZeta (1 - ρ) = analyticOrderAt riemannZeta ρ := by
-    -- Step 1: reflect
     rw [← analyticOrderAt_comp_const_sub riemannZeta 1 ρ]
-    -- Step 2: use the functional equation near `ρ`
     have hU : IsOpen {s : ℂ | 0 < s.re ∧ s.re < 1} :=
       (isOpen_lt continuous_const Complex.continuous_re).inter
         (isOpen_lt Complex.continuous_re continuous_const)
@@ -254,7 +248,6 @@ theorem zeroMultiplicity_one_sub {ρ : ℂ} (h0 : 0 < ρ.re) (h1 : ρ.re < 1) :
         linarith [hs0]
       exact zeta_one_sub_eq s hnen hne1
     rw [analyticOrderAt_congr heq]
-    -- Step 3: multiplication by an analytic non-vanishing factor
     have hz : AnalyticAt ℂ riemannZeta ρ := by
       refine differentiableOn_riemannZeta.analyticAt ?_
       refine IsOpen.mem_nhds isOpen_compl_singleton ?_

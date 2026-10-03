@@ -7,15 +7,25 @@ module
 
 public import Mathlib.Analysis.Analytic.Order
 public import Mathlib.NumberTheory.LSeries.RiemannZeta
-public import ZetaZeros.Defs
 public import ZetaZeros.Hilbert.Defs
+public import ZetaZeros.Definitions
 
 /-!
-# The rescaling and the kernel construction
+# The pair-correlation sum and the kernel construction
 
-The map carrying the zeros of height at most `T` to a conjugation-invariant multiset, and the
-kernel construction of the source's Section 3: the extremal test function, the smooth cutoffs that
-make it admissible, and the correction whose Fourier transform cancels the pair-correlation weight.
+The weighted pair-correlation sum over the non-trivial zeros, the rescaled zeros, the extremal test
+function `f₀` and its self-convolution, and the cutoff test functions `η_ψ`, `f_ψ = η_ψ²`,
+`Q_ψ = f_ψ ⋆ f_ψ` and `r_{ψ,T}` built from a `δ`-cutoff `ψ`.
+
+## Main definitions
+
+* `pairCorrelationSum`: the weighted sum over pairs of zeros up to height `T`.
+* `pairMainTerm`: the main term `g 0 + 2 ∫₀¹ α g α` of the pair-correlation formula.
+* `rescaledZeros`, `rescaledMult`: the rescaled zeros and their multiplicities.
+* `extremalTest`, `extremalSelfConv`: the extremal test function and its self-convolution.
+* `IsCutoff`: smooth even cutoffs supported in `(-1/2, 1/2)`.
+* `cutoffTest`, `cutoffTestSq`, `cutoffSelfConv`, `correctedTest`: the test functions built from
+  a cutoff.
 -/
 
 @[expose] public section
@@ -23,6 +33,27 @@ make it admissible, and the correction whose Fourier transform cancels the pair-
 namespace ZetaZeros
 
 open MeasureTheory
+
+/-- The weight `4 / (4 - z²)` carried by the unconditional pair-correlation formula. -/
+@[zz_tag "def_w"]
+noncomputable def pairWeight (z : ℂ) : ℂ := 4 / (4 - z ^ 2)
+
+/-- The rescaled difference `i(ρ - ρ') log T / (2π)` of two zeros. -/
+@[zz_tag "def_z_rho"]
+noncomputable def rescaledDiff (T : ℝ) (ρ ρ' : ℂ) : ℂ :=
+  Complex.I * (ρ - ρ') * ((Real.log T / (2 * Real.pi) : ℝ) : ℂ)
+
+/-- The main term `g 0 + 2 ∫₀¹ α g α` of the pair-correlation formula. -/
+@[zz_tag "def_A_functional"]
+noncomputable def pairMainTerm (f : ℝ → ℝ) : ℝ := f 0 + 2 * ∫ α in (0:ℝ)..1, α * f α
+
+/-- The weighted sum of `fourierC f` over ordered pairs of non-trivial zeros with imaginary part
+in `(0, T]`, each zero counted with multiplicity. -/
+@[zz_tag "def_B_T"]
+noncomputable def pairCorrelationSum (f : ℝ → ℝ) (T : ℝ) : ℂ :=
+  ∑ᶠ ρ ∈ nontrivialZeros T, ∑ᶠ ρ' ∈ nontrivialZeros T,
+    ((zeroMultiplicity ρ * zeroMultiplicity ρ' : ℕ) : ℂ) *
+      fourierC f (rescaledDiff T ρ ρ') * pairWeight (ρ - ρ')
 
 /-- The rescaling `ρ ↦ i(ρ - 1/2) log T / (2π)` that carries the zeros to a conjugation-invariant
 multiset. -/
@@ -50,8 +81,9 @@ noncomputable def extremalTest (x : ℝ) : ℝ :=
 @[zz_tag "def_Q0"]
 noncomputable def extremalSelfConv (x : ℝ) : ℝ := ∫ t : ℝ, extremalTest t * extremalTest (x - t)
 
-/-- `psi` is a `delta`-cutoff: smooth, even, supported in `(-1/2, 1/2)`, valued in `[0, 1]`, and
-identically `1` on `|x| ≤ 1/2 - delta`. -/
+/-- `psi` is a `delta`-cutoff: smooth, even, valued in `[0, 1]`, identically `1` on
+`|x| ≤ 1/2 - delta`, and compactly supported in `(-1/2, 1/2)` -- vanishing not merely off the open
+interval but on a neighbourhood of its endpoints. -/
 @[zz_tag "def_cutoff"]
 structure IsCutoff (delta : ℝ) (psi : ℝ → ℝ) : Prop where
   /-- `psi` is smooth. -/
@@ -66,6 +98,9 @@ structure IsCutoff (delta : ℝ) (psi : ℝ → ℝ) : Prop where
   le_one : ∀ x, psi x ≤ 1
   /-- `psi` is identically one on the shrunken interval. -/
   eq_one : ∀ x, |x| ≤ 1 / 2 - delta → psi x = 1
+  /-- `psi` vanishes on a neighbourhood of `±1/2`, so its support is a compact subset of the open
+  interval `(-1/2, 1/2)`. -/
+  margin : ∃ tau > 0, ∀ x, 1 / 2 - tau ≤ |x| → psi x = 0
 
 /-- The normalising constant `A_psi = ∫ psi² f₀`. -/
 @[zz_tag "def_normaliser"]

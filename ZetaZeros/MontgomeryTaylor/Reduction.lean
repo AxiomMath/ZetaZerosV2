@@ -22,7 +22,7 @@ open MeasureTheory
 namespace ZetaZeros
 
 /-- The self-convolution restricted to the support interval. -/
-lemma extremalSelfConv_eq_interval (α : ℝ) :
+private lemma extremalSelfConv_eq_interval (α : ℝ) :
     extremalSelfConv α = ∫ t in (-(1:ℝ)/2)..(1/2), extremalTest t * extremalTest (α - t) := by
   rw [extremalSelfConv]
   rw [intervalIntegral.integral_of_le (by norm_num : (-(1:ℝ)/2) ≤ 1/2),
@@ -37,17 +37,15 @@ lemma extremalSelfConv_eq_interval (α : ℝ) :
     · left; push Not at h; linarith
   rw [extremalTest_eq_zero hxout, zero_mul]
 
-/-- Part (I): `Q₀(0) = ∫_{-1/2}^{1/2} f₀(u)² du`. -/
-lemma step1_selfconv0 :
+/-- `Q₀(0) = ∫_{-1/2}^{1/2} f₀(u)² du`. -/
+private lemma step1_selfconv0 :
     extremalSelfConv 0 = ∫ u in (-(1:ℝ)/2)..(1/2), extremalTest u * extremalTest u := by
   rw [extremalSelfConv]
-  -- extremalTest (0 - t) = extremalTest (-t) = extremalTest t
   have hev : (fun t => extremalTest t * extremalTest (0 - t))
       = (fun t => extremalTest t * extremalTest t) := by
     funext t
     rw [zero_sub, extremalTest_even]
   rw [hev]
-  -- convert full-line integral to the interval via support
   rw [intervalIntegral.integral_of_le (by norm_num : (-(1:ℝ)/2) ≤ 1/2),
     ← MeasureTheory.integral_Icc_eq_integral_Ioc,
     MeasureTheory.setIntegral_eq_integral_of_forall_compl_eq_zero]
@@ -60,14 +58,13 @@ lemma step1_selfconv0 :
     · left; push Not at h; linarith
   rw [extremalTest_eq_zero hxout, mul_zero]
 
-/-- Inner reduction: substituting `β = α - t` and using the support of `extremalTest`,
+/-- Substituting `β = α - t` and using the support of `extremalTest`,
     `∫ α in 0..1, α · f₀(α - t) = ∫ β in -1/2..1/2, max(β+t, 0) · f₀(β)` for `|t| ≤ 1/2`. -/
-lemma inner_reduce {t : ℝ} (ht : |t| ≤ 1 / 2) :
+private lemma inner_reduce {t : ℝ} (ht : |t| ≤ 1 / 2) :
     (∫ α in (0:ℝ)..1, α * extremalTest (α - t))
       = ∫ β in (-(1:ℝ)/2)..(1/2), max (β + t) 0 * extremalTest β := by
   have htle : -(1:ℝ)/2 ≤ t ∧ t ≤ 1/2 := by
     rw [abs_le] at ht; constructor <;> linarith [ht.1, ht.2]
-  -- substitute β = α - t
   have hsub : (∫ α in (0:ℝ)..1, α * extremalTest (α - t))
       = ∫ β in (0 - t)..(1 - t), (β + t) * extremalTest β := by
     have h := intervalIntegral.integral_comp_sub_right
@@ -75,13 +72,11 @@ lemma inner_reduce {t : ℝ} (ht : |t| ≤ 1 / 2) :
     simp only [sub_add_cancel] at h
     rw [← h]
   rw [hsub, show (0:ℝ) - t = -t from by ring]
-  -- LHS: ∫ β in -t..(1-t), (β+t)·g β. Split at 1/2 and drop [1/2, 1-t] where g = 0.
   have hmt_le_half : -t ≤ (1:ℝ)/2 := by linarith [htle.1]
   have hhalf_le : (1:ℝ)/2 ≤ 1 - t := by linarith [htle.2]
   rw [← intervalIntegral.integral_add_adjacent_intervals
     (a := -t) (b := (1:ℝ)/2) (c := 1 - t)
     (linTest_intervalIntegrable t _ _) (linTest_intervalIntegrable t _ _)]
-  -- the [1/2, 1-t] piece vanishes: g β = 0 there
   have hdrop : (∫ β in ((1:ℝ)/2)..(1 - t), (β + t) * extremalTest β) = 0 := by
     rw [intervalIntegral.integral_of_le hhalf_le,
       MeasureTheory.integral_eq_zero_of_ae]
@@ -94,7 +89,6 @@ lemma inner_reduce {t : ℝ} (ht : |t| ≤ 1 / 2) :
       change (β + t) * extremalTest β = 0
       rw [extremalTest_eq_zero hb0, mul_zero]
   rw [hdrop, add_zero]
-  -- RHS: ∫ β in -1/2..1/2, max(β+t,0)·g β. Split at -t; drop [-1/2, -t] where max = 0.
   rw [← intervalIntegral.integral_add_adjacent_intervals
     (a := -(1:ℝ)/2) (b := -t) (c := (1:ℝ)/2)
     (maxTest_intervalIntegrable t _ _) (maxTest_intervalIntegrable t _ _)]
@@ -110,24 +104,21 @@ lemma inner_reduce {t : ℝ} (ht : |t| ≤ 1 / 2) :
       change max (β + t) 0 * extremalTest β = 0
       rw [max_eq_right hbt, zero_mul]
   rw [hdrop2, zero_add]
-  -- the two middle pieces on [-t, 1/2] agree: max(β+t,0) = β+t since β+t ≥ 0.
   apply intervalIntegral.integral_congr
   intro β hβ
   rw [Set.uIcc_of_le hmt_le_half, Set.mem_Icc] at hβ
   simp only
   rw [max_eq_left (by linarith [hβ.1] : (0:ℝ) ≤ β + t)]
 
-/-- Part (II): `2 ∫₀¹ α Q₀(α) dα = ∫∫ |u-v| f₀(u) f₀(v)`. -/
-lemma step1_double :
+/-- `2 ∫₀¹ α Q₀(α) dα = ∫∫ |u-v| f₀(u) f₀(v)`. -/
+private lemma step1_double :
     2 * ∫ α in (0:ℝ)..1, α * extremalSelfConv α
       = ∫ u in (-(1:ℝ)/2)..(1/2),
           extremalTest u * ∫ v in (-(1:ℝ)/2)..(1/2), |u - v| * extremalTest v := by
   set g := extremalTest with hg
-  -- The common middle expression: `∫∫ max(t+β,0) g(t) g(β)`.
   set a : ℝ := -(1:ℝ)/2 with ha
   set b : ℝ := (1:ℝ)/2 with hb
   have hab : a ≤ b := by rw [ha, hb]; norm_num
-  -- Continuity/integrability facts on the fixed interval.
   have hgIntOn : ∀ (s : Set ℝ), volume s < ⊤ → IntegrableOn g s volume :=
     fun s hs => extremalTest_integrableOn hs
   have h2 : (0:ℝ) < Real.sqrt 2 := Real.sqrt_pos.mpr (by norm_num)
@@ -144,7 +135,6 @@ lemma step1_double :
   have hsin_pos : 0 < Real.sin (1 / Real.sqrt 2) :=
     Real.sin_pos_of_pos_of_lt_pi hinv_pos hinv_lt_pi
   have hden_pos : 0 < Real.sqrt 2 * Real.sin (1 / Real.sqrt 2) := mul_pos h2 hsin_pos
-  -- Step 1: restrict inner conv and pull α inside.
   have hL1 : (∫ α in (0:ℝ)..1, α * extremalSelfConv α)
       = ∫ α in (0:ℝ)..1, ∫ t in a..b, α * (g t * g (α - t)) := by
     apply intervalIntegral.integral_congr
@@ -152,7 +142,6 @@ lemma step1_double :
     simp only
     rw [extremalSelfConv_eq_interval, ← ha, ← hb, hg]
     rw [intervalIntegral.integral_const_mul]
-  -- integrability of the joint integrand on the rectangle
   have hMeas : Measurable (Function.uncurry (fun α t => α * (g t * g (α - t)))) := by
     unfold Function.uncurry
     apply Measurable.mul measurable_fst
@@ -179,10 +168,8 @@ lemma step1_double :
       apply ENNReal.mul_lt_top
       · rw [Set.uIoc]; exact measure_Ioc_lt_top
       · rw [Set.uIoc]; exact measure_Ioc_lt_top
-  -- Step 2 (Fubini): swap the two interval integrals.
   have hL2 : (∫ α in (0:ℝ)..1, ∫ t in a..b, α * (g t * g (α - t)))
       = ∫ t in a..b, ∫ α in (0:ℝ)..1, α * (g t * g (α - t)) := by
-    -- convert interval integrals to set integrals over Ioc, then apply the product swap.
     rw [intervalIntegral.integral_of_le (by norm_num : (0:ℝ) ≤ 1)]
     have hcongr1 : ∀ α, (∫ t in a..b, α * (g t * g (α - t)))
         = ∫ t in Set.Ioc a b, α * (g t * g (α - t)) :=
@@ -192,7 +179,6 @@ lemma step1_double :
       fun t => intervalIntegral.integral_of_le (by norm_num)
     simp_rw [hcongr1, hcongr2]
     rw [intervalIntegral.integral_of_le hab]
-    -- rephrase as integral against restricted measures
     have hInt : Integrable (Function.uncurry (fun α t => α * (g t * g (α - t))))
         ((volume.restrict (Set.Ioc (0:ℝ) 1)).prod (volume.restrict (Set.Ioc a b))) := by
       rw [Measure.prod_restrict]
@@ -203,7 +189,6 @@ lemma step1_double :
     have := MeasureTheory.integral_integral_swap (μ := volume.restrict (Set.Ioc (0:ℝ) 1))
       (ν := volume.restrict (Set.Ioc a b)) hInt
     simpa only [Function.uncurry] using this
-  -- Step 3: `∫ α, α Q₀ α = ∫ t, g t · ∫ v, max(t - v, 0) · g v`.
   have hM : (∫ α in (0:ℝ)..1, α * extremalSelfConv α)
       = ∫ t in a..b, g t * ∫ v in a..b, max (t - v) 0 * g v := by
     rw [hL1, hL2]
@@ -211,7 +196,6 @@ lemma step1_double :
     intro t ht
     rw [Set.uIcc_of_le hab, ha, hb, Set.mem_Icc] at ht
     have htabs : |t| ≤ 1/2 := by rw [abs_le]; constructor <;> linarith [ht.1, ht.2]
-    -- pull g t out of the inner integral
     have hpull : (∫ α in (0:ℝ)..1, α * (g t * g (α - t)))
         = g t * ∫ α in (0:ℝ)..1, α * g (α - t) := by
       rw [← intervalIntegral.integral_const_mul]
@@ -219,9 +203,7 @@ lemma step1_double :
       intro α _; ring
     simp only
     rw [hpull, hg, inner_reduce htabs]
-    -- reflect v → -v : ∫ β, max(β+t,0) g β = ∫ v, max(t-v,0) g v
     congr 1
-    -- apply integral_comp_neg to `f v = max (t - v) 0 * extremalTest v`
     have hrefl := intervalIntegral.integral_comp_neg
       (fun v => max (t - v) 0 * extremalTest v) (a := -(1:ℝ)/2) (b := (1:ℝ)/2)
     rw [show (-(-(1:ℝ)/2)) = (1:ℝ)/2 from by norm_num,
@@ -231,10 +213,8 @@ lemma step1_double :
     intro β _
     simp only
     rw [extremalTest_even, sub_neg_eq_add, add_comm]
-  -- Step 4 (symmetry): swapping `t ↔ v` in the double integral of `K t v = g t g v max(t-v,0)`.
   have hsymm : (∫ t in a..b, g t * ∫ v in a..b, max (t - v) 0 * g v)
       = ∫ t in a..b, g t * ∫ v in a..b, max (v - t) 0 * g v := by
-    -- pull `g t` inside on both sides to get the double integral of `φ t v = g t g v max(t-v,0)`
     have hpullL : (∫ t in a..b, g t * ∫ v in a..b, max (t - v) 0 * g v)
         = ∫ t in a..b, ∫ v in a..b, g t * g v * max (t - v) 0 := by
       apply intervalIntegral.integral_congr; intro t _
@@ -248,9 +228,7 @@ lemma step1_double :
       rw [← intervalIntegral.integral_const_mul]
       apply intervalIntegral.integral_congr; intro v _; simp only; ring
     rw [hpullL, hpullR]
-    -- Fubini swap `∫ t ∫ v φ t v = ∫ v ∫ t φ t v`, then rename dummy variables.
     set φ : ℝ → ℝ → ℝ := fun t v => g t * g v * max (t - v) 0 with hφ
-    -- measurability of the uncurried kernel
     have hMeasφ : Measurable (Function.uncurry φ) := by
       unfold Function.uncurry
       simp only [hφ]
@@ -258,7 +236,6 @@ lemma step1_double :
       · exact (extremalTest_measurable.comp measurable_fst).mul
           (extremalTest_measurable.comp measurable_snd)
       · exact (measurable_fst.sub measurable_snd).max measurable_const
-    -- integrability on the square
     have hIntφ : IntegrableOn (Function.uncurry φ)
         (Set.uIoc a b ×ˢ Set.uIoc a b) volume := by
       apply MeasureTheory.IntegrableOn.of_bound _ hMeasφ.aestronglyMeasurable (C * C * 1)
@@ -281,7 +258,6 @@ lemma step1_double :
         apply ENNReal.mul_lt_top
         · rw [Set.uIoc]; exact measure_Ioc_lt_top
         · rw [Set.uIoc]; exact measure_Ioc_lt_top
-    -- fold both integrands into `φ`
     have hLHS : (∫ t in a..b, ∫ v in a..b, g t * g v * max (t - v) 0)
         = ∫ t in a..b, ∫ v in a..b, φ t v := by
       apply intervalIntegral.integral_congr; intro t _
@@ -293,7 +269,6 @@ lemma step1_double :
       apply intervalIntegral.integral_congr; intro v _
       simp only [hφ]
     rw [hLHS, hRHS]
-    -- convert both nested interval integrals over a..b to set integrals over Ioc a b
     have hc1 : ∀ t, (∫ v in a..b, φ t v) = ∫ v in Set.Ioc a b, φ t v :=
       fun t => intervalIntegral.integral_of_le hab
     have hc2 : ∀ t, (∫ v in a..b, φ v t) = ∫ v in Set.Ioc a b, φ v t :=
@@ -305,7 +280,6 @@ lemma step1_double :
         = ∫ t in Set.Ioc a b, ∫ v in Set.Ioc a b, φ v t := by
       rw [intervalIntegral.integral_of_le hab]; simp_rw [hc2]
     rw [hL, hR]
-    -- now goal: ∫ t in Ioc, ∫ v in Ioc, φ t v = ∫ t in Ioc, ∫ v in Ioc, φ v t
     rw [show Set.uIoc a b = Set.Ioc a b from Set.uIoc_of_le hab] at hIntφ
     have hInt : Integrable (Function.uncurry φ)
         ((volume.restrict (Set.Ioc a b)).prod (volume.restrict (Set.Ioc a b))) := by
@@ -317,7 +291,6 @@ lemma step1_double :
         = ∫ t, ∫ v, φ t v ∂(volume.restrict (Set.Ioc a b))
             ∂(volume.restrict (Set.Ioc a b)) from rfl]
     rw [hswap]
-  -- Step 5: `2·(∫ α Q₀) = ∫∫ (max(t-v,0)+max(v-t,0)) g t g v = ∫∫ |t-v| g t g v = RHS`.
   rw [hM, two_mul]
   nth_rewrite 2 [hsymm]
   rw [← intervalIntegral.integral_add ?hi1 ?hi2]
@@ -341,19 +314,17 @@ lemma step1_double :
     rw [ha, hb, hg]
     exact outer_intervalIntegrable (fun t v => max (v - t) 0) (by fun_prop)
 
+/-- `Q₀(0) + 2 ∫₀¹ α Q₀(α) dα = ∫_{-1/2}^{1/2} f₀(u) G(u) du`. -/
 lemma montgomeryTaylor_step1 :
     extremalSelfConv 0 + 2 * ∫ α in (0:ℝ)..1, α * extremalSelfConv α
       = ∫ u in (-(1:ℝ)/2)..(1/2), extremalTest u * extremalG u := by
   rw [step1_selfconv0, step1_double]
-  -- Integrability of the two pieces of `f₀·G`.
   have hint1 : IntervalIntegrable (fun u => extremalTest u * extremalTest u)
       MeasureTheory.volume (-(1:ℝ)/2) (1/2) :=
     (extremalTest_continuousOn.mul extremalTest_continuousOn).intervalIntegrable
   have hint2 : IntervalIntegrable
       (fun u => extremalTest u * ∫ v in (-(1:ℝ)/2)..(1/2), |u - v| * extremalTest v)
       MeasureTheory.volume (-(1:ℝ)/2) (1/2) := by
-    -- rewrite the inner kernel to its continuous form on the interval, giving a jointly
-    -- continuous parametric integral, then multiply by the continuous `extremalTest`.
     have hcont : Continuous (fun u => ∫ v in (-(1:ℝ)/2)..(1/2),
         |u - v| * (Real.cos (Real.sqrt 2 * v) / (Real.sqrt 2 * Real.sin (1 / Real.sqrt 2)))) := by
       apply intervalIntegral.continuous_parametric_intervalIntegral_of_continuous'
@@ -368,7 +339,6 @@ lemma montgomeryTaylor_step1 :
     intro v hv
     simp only
     rw [extremalTest_eqOn_uIcc hv]
-  -- Now split the integral of the sum on the RHS.
   rw [show (fun u => extremalTest u * extremalG u)
       = (fun u => extremalTest u * extremalTest u
           + extremalTest u * ∫ v in (-(1:ℝ)/2)..(1/2), |u - v| * extremalTest v) from by

@@ -15,8 +15,7 @@ public import ZetaZeros.Hilbert.Subspaces
 An orthonormal basis of `W` whose initial segments span `U` and `V`, and the coefficients of the
 two-variable kernel against its tensor squares.
 
-The three subspaces are finite-dimensional — each is spanned by a finite family — which is what
-makes `Module.finrank` the right index bound and Gram–Schmidt applicable.
+The three subspaces are finite-dimensional, each being spanned by a finite family.
 -/
 
 @[expose] public section
@@ -27,25 +26,27 @@ open MeasureTheory
 
 variable {lam : ℝ} {eta : ℝ → ℝ}
 
+/-- `U` is finite-dimensional. -/
 instance finiteDimensional_subspaceU (h : IsAdmissible lam eta) (Z : Finset ℂ) (m : ℂ → ℕ) :
     FiniteDimensional ℂ (subspaceU h Z m) :=
   FiniteDimensional.span_of_finite ℂ
     (((Finset.finite_toSet _).image _).union ((Finset.finite_toSet _).image _))
 
+/-- `W` is finite-dimensional. -/
 instance finiteDimensional_subspaceW (h : IsAdmissible lam eta) (Z : Finset ℂ) (m : ℂ → ℕ) :
     FiniteDimensional ℂ (subspaceW h Z m) :=
   FiniteDimensional.span_of_finite ℂ
     ((((Finset.finite_toSet _).image _).union ((Finset.finite_toSet _).image _)).union
       ((Finset.finite_toSet _).image _))
 
+/-- `V` is finite-dimensional. -/
 instance finiteDimensional_subspaceV (h : IsAdmissible lam eta) (Z : Finset ℂ) (m : ℂ → ℕ) :
     FiniteDimensional ℂ (subspaceV h Z m) :=
   FiniteDimensional.span_of_finite ℂ
     (((Finset.finite_toSet _).image _).union ((Finset.finite_toSet _).image _))
 
 /-- A tuple is an *adapted orthonormal basis*: orthonormal, spanning `W`, and with the initial
-segments of lengths `dim U` and `dim V` spanning `U` and `V`. The nesting proved in
-`subspaceU_le_subspaceV` is what makes such a tuple possible. -/
+segments of lengths `dim U` and `dim V` spanning `U` and `V`. -/
 @[zz_tag "def_adapted_basis"]
 structure IsAdaptedBasis (h : IsAdmissible lam eta) (Z : Finset ℂ) (m : ℂ → ℕ)
     (psi : Fin (Module.finrank ℂ (subspaceW h Z m)) → L2Interval lam) : Prop where

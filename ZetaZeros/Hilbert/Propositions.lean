@@ -11,15 +11,19 @@ public import ZetaZeros.Hilbert.Support
 /-!
 # The two further conclusions of the key proposition
 
-Equations (2.5) and (2.6) of the source. Each is a three-range estimate over the Bessel
-coefficients, carrying its own A/B/C disjoint cover of the basis, followed by the same assembly
-`card_simpleRealPart_lower` performs.
+Equations (2.5) and (2.6) of the source: lower bounds for `|simplePart Z m|` plus the mass of the
+real part, and for the mass of `simpleOrRealPart Z m`. Each follows from a three-range estimate
+over the Bessel coefficients.
 
-(2.6) is the only place a parameter is chosen: `t = 2 + √2`, forced by `t² - 4t + 2 = 0`, which is
-what makes the multiple-non-real contribution cancel. It is substituted from the start rather than
-carried as a variable, and the three weights it determines are `b₁ = 5/2 + √2 - A`,
+In (2.6) the parameter is `t = 2 + √2`, a root of `t² - 4t + 2 = 0`, which makes the
+multiple-non-real contribution cancel. The three weights it determines are `b₁ = 5/2 + √2 - A`,
 `b₂ = 3/2 + √2`, `b₃ = 1/2 + √2`, satisfying `t² = 4b₂`, `b₁ + b₂ = 2t - A`, `b₁ - b₃ = 2 - A` and
 `b₃ + 1 = b₂`.
+
+## Main results
+
+* `card_simplePart_add_realMass_lower`: equation (2.5).
+* `simpleOrRealMass_lower`: equation (2.6).
 -/
 
 @[expose] public section
@@ -30,7 +34,7 @@ variable {lam : ℝ} {eta : ℝ → ℝ} {Z : Finset ℂ} {m : ℂ → ℕ}
 
 /-- The three-range estimate behind (2.5). First range `a² + 4 ≥ 4a`, middle `a² + 1 ≥ 2a`, last
 `a ≤ 0 ⟹ a² ≥ 3a`. -/
-theorem three_range_simple_plus_real {N dU dV R1 R2 S1 S2 : ℕ} (a : Fin N → ℝ)
+private theorem three_range_simple_plus_real {N dU dV R1 R2 S1 S2 : ℕ} (a : Fin N → ℝ)
     (hdUV : dU ≤ dV) (hdVN : dV ≤ N)
     (hdU : dU ≤ R2 + S1 / 2 + S2 / 2) (hdGap : dV ≤ dU + R1)
     (hfirst : 2 * (R2 : ℝ) + (S1 : ℝ) + 2 * (S2 : ℝ) ≤
@@ -108,9 +112,8 @@ theorem three_range_simple_plus_real {N dU dV R1 R2 S1 S2 : ℕ} (a : Fin N → 
   linarith
 
 /-- The three-range estimate behind (2.6). First range `a² ≥ 2at - t²` with `t = 2 + √2`, middle
-`a² + 1 ≥ 2a`, last `a ≤ 0` and `A > 0` giving `a² ≥ A a`. The choice of `t` is forced by
-`t² - 4t + 2 = 0`, which is what cancels the multiple-non-real contribution. -/
-theorem three_range_simple_or_real {N dU dV R1 R2 S1 S2 : ℕ} {Ac : ℝ} (a : Fin N → ℝ)
+`a² + 1 ≥ 2a`, last `a ≤ 0` and `A > 0` giving `a² ≥ A a`. -/
+private theorem three_range_simple_or_real {N dU dV R1 R2 S1 S2 : ℕ} {Ac : ℝ} (a : Fin N → ℝ)
     (hdUV : dU ≤ dV) (hdVN : dV ≤ N)
     (hdU : dU ≤ R2 + S1 / 2 + S2 / 2) (hdGap : dV ≤ dU + R1)
     (hA1 : 1 ≤ Ac) (hA2 : Ac < 2)
@@ -171,7 +174,6 @@ theorem three_range_simple_or_real {N dU dV R1 R2 S1 S2 : ℕ} {Ac : ℝ} (a : F
     refine Finset.sum_nonpos fun j hj => ?_
     have hj' : dV ≤ (j : ℕ) := by simpa [C] using hj
     exact hthird j hj'
-  -- first range: (a - t)^2 >= 0 with t = 2 + sqrt 2
   have hsqA : 2 * (2 + Real.sqrt 2) * (∑ j ∈ A, a j)
       - (6 + 4 * Real.sqrt 2) * (A.card : ℝ) ≤ ∑ j ∈ A, a j ^ 2 := by
     calc 2 * (2 + Real.sqrt 2) * (∑ j ∈ A, a j) - (6 + 4 * Real.sqrt 2) * (A.card : ℝ)
@@ -197,7 +199,6 @@ theorem three_range_simple_or_real {N dU dV R1 R2 S1 S2 : ℕ} {Ac : ℝ} (a : F
       ∑ j, f j = (∑ j ∈ A, f j) + (∑ j ∈ B, f j) + ∑ j ∈ C, f j := by
     rw [← hcover, Finset.sum_union hABC, Finset.sum_union hAB]
   rw [hsum a, hsum (fun j => a j ^ 2)] at hsq
-  -- the four products linarith cannot form for itself
   have hb2 : (0:ℝ) ≤ 3 / 2 + Real.sqrt 2 := by linarith [Real.sqrt_nonneg 2]
   have hb3 : (0:ℝ) ≤ 1 / 2 + Real.sqrt 2 := by linarith [Real.sqrt_nonneg 2]
   have hb1 : (0:ℝ) < 5 / 2 + Real.sqrt 2 - Ac := by linarith [Real.sqrt_nonneg 2]
@@ -215,8 +216,7 @@ theorem three_range_simple_or_real {N dU dV R1 R2 S1 S2 : ℕ} {Ac : ℝ} (a : F
   rw [div_mul_eq_mul_div, div_le_iff₀ hden, hsum a]
   linarith [p1, p2, p3, p4, hsqA, hsqB, hsqC, hsq, hCle]
 
-/-- **Lower bound for the simple part plus the real mass** (`prop_simple_plus_real_lower`),
-equation (2.5). -/
+/-- **Lower bound for the simple part plus the real mass**, equation (2.5). -/
 @[zz_tag "prop_simple_plus_real_lower"]
 theorem card_simplePart_add_realMass_lower (h : IsAdmissible lam eta)
     (hZ : IsConjInvariant Z m) (_hZne : Z.Nonempty) :
@@ -260,7 +260,7 @@ theorem card_simplePart_add_realMass_lower (h : IsAdmissible lam eta)
   push_cast
   linarith
 
-/-- **Lower bound for the simple-or-real mass** (`prop_simple_or_real_lower`), equation (2.6). -/
+/-- **Lower bound for the simple-or-real mass**, equation (2.6). -/
 @[zz_tag "prop_simple_or_real_lower"]
 theorem simpleOrRealMass_lower {Ac : ℝ} (h : IsAdmissible lam eta)
     (hZ : IsConjInvariant Z m) (_hZne : Z.Nonempty) (hA1 : 1 ≤ Ac) (hA2 : Ac < 2)

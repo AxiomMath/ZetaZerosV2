@@ -12,9 +12,8 @@ public import ZetaZeros.Hilbert.Defs
 /-!
 # Inner products of symmetric functions are real
 
-The reason the source may apply real inequalities such as `a² + 1 ≥ 2a` to the Bessel coefficients:
-every inner product formed from symmetric functions is real, because conjugating it is the same as
-reflecting the interval, and the interval `(-lam, lam)` is reflection-invariant.
+Every inner product on `(-lam, lam)` of two symmetric functions is real: conjugating it is the
+same as reflecting the interval, and the interval is reflection-invariant.
 -/
 
 @[expose] public section
@@ -22,7 +21,7 @@ reflecting the interval, and the interval `(-lam, lam)` is reflection-invariant.
 namespace ZetaZeros
 
 /-- **Inner products of symmetric functions are self-conjugate.** -/
-theorem conj_inner_symmetric {Φ₁ Φ₂ : ℝ → ℂ} (h1 : IsSymmetric Φ₁) (h2 : IsSymmetric Φ₂)
+private theorem conj_inner_symmetric {Φ₁ Φ₂ : ℝ → ℂ} (h1 : IsSymmetric Φ₁) (h2 : IsSymmetric Φ₂)
     (lam : ℝ) :
     (starRingEnd ℂ) (∫ u in (-lam)..lam, Φ₁ u * (starRingEnd ℂ) (Φ₂ u))
       = ∫ u in (-lam)..lam, Φ₁ u * (starRingEnd ℂ) (Φ₂ u) := by

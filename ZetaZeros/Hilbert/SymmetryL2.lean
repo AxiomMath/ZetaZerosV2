@@ -11,15 +11,13 @@ public import ZetaZeros.Hilbert.Symmetry
 /-!
 # Symmetry on `L²`, as a real subspace
 
-Pointwise symmetry cannot be carried into `L²` unchanged: elements of `Lp` are equivalence classes,
-so the property must be stated almost everywhere. Doing so needs one genuinely new ingredient — an
-a.e. statement has to be transportable through `u ↦ -u`, which holds because negation preserves
-Lebesgue measure and `Ioo (-lam) lam` is reflection-invariant.
+Elements of `Lp` are equivalence classes, so symmetry of an element of `L²` is stated almost
+everywhere (`IsSymmetricL2`). An a.e. statement on `Ioo (-lam) lam` transports through `u ↦ -u`
+(`ae_restrict_Ioo_neg`), because negation preserves Lebesgue measure and the interval is
+reflection-invariant.
 
-Once that is available the symmetric elements form an **ℝ**-subspace. Not a `ℂ`-one: multiplying by
-`i` sends `conj (f u) = f (-u)` to `conj (i · f u) = -i · conj (f u)`, which fails. That is exactly
-the structure the Gram–Schmidt argument needs, since its coefficients are real by
-`inner_symmetric_im_eq_zero` and so it never leaves the subspace.
+The symmetric elements form an `ℝ`-subspace, `symmetricSubspace`, but not a `ℂ`-subspace:
+multiplying by `i` sends `conj (f u) = f (-u)` to `conj (i · f u) = -i · conj (f u)`, which fails.
 -/
 
 @[expose] public section
